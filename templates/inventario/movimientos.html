@@ -1,0 +1,23 @@
+{% extends "panel/indice.html" %}
+
+{% block panel_cuerpo %}
+  <p class="interno__acciones"><a class="ui-boton ui-boton--navegacion" href="{% url 'inventario_gestion' %}">Volver al inventario</a></p>
+  {% if movimientos %}
+    <ul class="cuenta-lista">
+      {% for movimiento in movimientos %}
+        <li>
+          <span>{{ movimiento.creada|date:"d-m-Y H:i" }}</span>
+          <strong>{{ movimiento.insumo.nombre }}</strong>
+          <span>{{ movimiento.get_tipo_display }}</span>
+          <span>{{ movimiento.cantidad }}</span>
+          <span>Quedó en {{ movimiento.existencia_resultante }}</span>
+          <span>{{ movimiento.motivo }}</span>
+          {% if movimiento.usuario %}<span>{{ movimiento.usuario.get_username }}</span>{% endif %}
+          {% if movimiento.pedido %}<span>Pedido {{ movimiento.pedido.codigo }}</span>{% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>Todavía no hay movimientos.</p>
+  {% endif %}
+{% endblock %}

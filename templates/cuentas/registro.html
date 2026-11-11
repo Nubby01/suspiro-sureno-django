@@ -1,0 +1,45 @@
+{% extends "cuentas/_pagina.html" %}
+{% load interfaz %}
+{% load static %}
+
+{% block titulo %}Crear cuenta · Suspiro Sureño{% endblock %}
+{% block descripcion %}Regístrate para guardar tus cotizaciones y consultar tus pedidos cuando quieras.{% endblock %}
+
+{% block clase_pagina %}cuenta-pagina--acceso{% endblock %}
+{% block cuenta %}
+  <div class="cuenta-escena">
+    <figure class="cuenta-escena__foto">
+      <div class="cuenta-escena__marco">
+        <img src="{% static 'imagenes/piedelimoninicio.png' %}" alt="Pie de limón con merengue tostado.">
+      </div>
+    </figure>
+    <div class="cuenta-escena__formulario">
+      <div class="cuenta-acceso">
+        <header class="cuenta-intro">
+          <h1>Crear cuenta</h1>
+          <p>Regístrate para guardar tus cotizaciones y consultar tus pedidos cuando quieras.</p>
+        </header>
+        <form class="cuenta-tarjeta" method="post" novalidate>
+          {% csrf_token %}
+          {% if form.non_field_errors %}
+            <div class="mensaje-error" role="alert">{{ form.non_field_errors }}</div>
+          {% endif %}
+          {% for campo in form %}
+            <div class="campo{% if campo.widget_type == 'textarea' %} campo--ancho{% endif %}">
+              <label for="{{ campo.id_for_label }}">{{ campo.label }}</label>
+              {{ campo|campo_ui }}
+              {% if campo.help_text %}<p class="ayuda" id="ayuda-{{ campo.name }}">{{ campo.help_text }}</p>{% endif %}
+              {% if campo.errors %}
+                <ul class="errorlist" role="alert">
+                  {% for error in campo.errors %}<li>{{ error }}</li>{% endfor %}
+                </ul>
+              {% endif %}
+            </div>
+          {% endfor %}
+          <button class="boton-cuenta ui-boton" type="submit">Crear cuenta</button>
+        </form>
+        <p class="cuenta-alternativa"><a href="{% url 'ingresar' %}">Ya tengo cuenta</a></p>
+      </div>
+    </div>
+  </div>
+{% endblock %}

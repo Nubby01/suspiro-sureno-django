@@ -1,0 +1,33 @@
+{% extends "panel/indice.html" %}
+{% load interfaz %}
+{% block panel_cuerpo %}
+<nav class="interno__acciones" aria-label="Navegación del insumo">
+  <a class="ui-boton ui-boton--navegacion" href="{% url 'inventario_gestion' %}">Volver al inventario</a>
+  <a class="ui-boton ui-boton--editar ui-boton--editar" href="{% url 'inventario_editar' insumo.pk %}">Editar insumo</a>
+  <a class="ui-boton ui-boton--guardar ui-boton--guardar" href="{% url 'inventario_entrada' %}">Registrar abastecimiento</a>
+</nav>
+<dl class="ficha">
+ <div><dt>Existencia</dt><dd>{{ insumo.existencia }} {{ insumo.get_unidad_display }} · <span class="estado stock--{{ insumo.nivel_stock }}">{{ insumo.etiqueta_stock }}</span></dd></div>
+ <div><dt>Umbrales</dt><dd>Mínimo: {{ insumo.stock_minimo }}. Crítico: {{ insumo.stock_critico|default_if_none:"Sin configurar" }}.</dd></div>
+ <div><dt>Última compra registrada</dt><dd>{% if ultima_compra %}{{ ultima_compra.cantidad_inicial }} {{ ultima_compra.get_unidad_display }} · Compra: {{ ultima_compra.fecha_compra|date:"d-m-Y"|default:"Fecha no registrada" }} · Ingreso: {{ ultima_compra.movimiento.creada|date:"d-m-Y H:i" }}{% else %}No hay compras identificadas. Las entradas antiguas conservan su trazabilidad.{% endif %}</dd></div>
+ <div><dt>Caducidad más próxima con saldo</dt><dd>{% if proximo %}{{ proximo.caducidad|date:"d-m-Y" }} · {{ proximo.saldo }} {{ proximo.get_unidad_display }}{% if proximo.caducidad < hoy %} <span class="estado stock--critico">Vencido</span>{% endif %}{% else %}Sin caducidades conocidas en lotes con saldo.{% endif %}</dd></div>
+ <div><dt>Existencia sin lote registrado</dt><dd>{{ sin_lote }} {{ insumo.get_unidad_display }}</dd></div>
+</dl>
+<details class="panel-ayuda"><summary>Cómo se mantiene la trazabilidad</summary><p>Solo las entradas nuevas generan lotes. Se descuenta primero el lote con caducidad más próxima (FEFO), después los lotes sin fecha, y finalmente la existencia sin lote. Un ajuste negativo también registra sus salidas. Un ajuste positivo aumenta la existencia sin lote. La caducidad es informativa: no cambia las reglas de preparación.</p></details>
+<h2>Historial de abastecimientos</h2>
+<div class="tabla-marco"><table class="tabla-panel"><thead><tr><th>Ingreso</th><th>Tipo / compra</th><th>Cantidad</th><th>Lote / saldo</th><th>Datos disponibles</th><th>Responsable</th></tr></thead><tbody>
+{% for entrada in entradas %}<tr>
+<td data-etiqueta="Ingreso">{{ entrada.creada|date:"d-m-Y H:i" }}</td>
+<td data-etiqueta="Tipo / compra">{% if entrada.abastecimiento.es_compra %}Compra · {{ entrada.abastecimiento.fecha_compra|date:"d-m-Y"|default:"Fecha no registrada" }}{% else %}Entrada · compra no identificada{% endif %}</td>
+<td data-etiqueta="Cantidad">{{ entrada.cantidad }} {{ insumo.get_unidad_display }}</td>
+<td data-etiqueta="Lote / saldo">{% if entrada.abastecimiento %}{{ entrada.abastecimiento.lote|default:"Sin referencia" }} · Saldo: {{ entrada.abastecimiento.saldo }}{% else %}Entrada anterior sin seguimiento de lote{% endif %}</td>
+<td data-etiqueta="Datos disponibles">{% if entrada.abastecimiento %}
+  Proveedor/origen: {{ entrada.abastecimiento.proveedor|default:"No registrado" }}<br>
+  Importe de compra: {% if entrada.abastecimiento.precio_compra != None %}{{ entrada.abastecimiento.precio_compra|monto_compra }}{% else %}No registrado{% endif %}<br>
+  Caducidad: {{ entrada.abastecimiento.caducidad|date:"d-m-Y"|default:"No registrada" }}<br>
+  {{ entrada.abastecimiento.observaciones }}
+{% endif %}<p>{{ entrada.motivo }}</p></td>
+<td data-etiqueta="Responsable">{% if entrada.usuario %}{{ entrada.usuario.get_full_name|default:entrada.usuario.username }}{% else %}No registrado{% endif %}</td>
+</tr>{% empty %}<tr><td data-etiqueta="Historial" colspan="6">Todavía no hay entradas.</td></tr>{% endfor %}
+</tbody></table></div>
+{% endblock %}

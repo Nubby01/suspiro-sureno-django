@@ -1,0 +1,519 @@
+.kicker {
+  display: flex;
+  align-items: baseline;
+  gap: 0.55rem;
+  margin: 0 0 0.85rem;
+  color: var(--chocolate);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.kicker span {
+  color: var(--terracota);
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  line-height: inherit;
+}
+
+h1, h2, .tarjeta-categoria h3, .tarjeta-muestra h3 {
+  font-family: var(--fuente-display);
+  font-weight: 400;
+  letter-spacing: -0.03em;
+  line-height: 1.08;
+}
+
+h1 em, h2 em {
+  font-style: italic;
+  font-weight: 400;
+}
+
+.hero {
+  padding: 2.25rem 0 3.5rem;
+}
+
+.hero__grilla {
+  display: grid;
+  gap: 2rem;
+}
+
+.hero__texto h1 {
+  margin: 0;
+  font-size: clamp(2.15rem, 4.2vw + 1rem, 4.8rem);
+  max-width: 8.4em;
+}
+
+.hero__bajada {
+  max-width: 34rem;
+  margin: 1.15rem 0 0;
+  font-size: 1.08rem;
+}
+
+.botones {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.75rem;
+  margin-top: 1.6rem;
+}
+
+.boton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 3rem;
+  padding: 0.75rem 1.3rem;
+  border: 1.5px solid transparent;
+  border-radius: 999px;
+  font-family: var(--fuente);
+  font-size: 0.98rem;
+  font-weight: 600;
+  line-height: 1.2;
+  text-align: center;
+  text-decoration: none;
+}
+
+.boton--relleno,
+.boton--relleno:disabled {
+  background: var(--terracota);
+  color: var(--crema);
+}
+
+.boton--contorno,
+.boton--contorno:disabled {
+  background: transparent;
+  color: var(--chocolate);
+  border-color: var(--chocolate);
+}
+
+.boton--durazno,
+.boton--durazno:disabled {
+  background: var(--durazno);
+  color: var(--chocolate);
+}
+
+.boton:disabled {
+  opacity: 1;
+  cursor: default;
+}
+
+a.boton--relleno:hover {
+  background: var(--chocolate);
+}
+
+a.boton--contorno:hover,
+a.boton--durazno:hover {
+  background: var(--crema);
+}
+
+.nota-accion {
+  margin: 0.85rem 0 0;
+  max-width: 28rem;
+  color: var(--chocolate);
+  font-size: 0.92rem;
+}
+
+.hero__visual {
+  display: grid;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.hero__lugar {
+  justify-self: end;
+  margin: 0;
+  color: var(--terracota);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.hero__marco {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+}
+
+.forma {
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.forma--durazno {
+  width: 42%;
+  aspect-ratio: 1;
+  top: -4%;
+  right: 4%;
+  background: var(--durazno);
+  border-radius: 50% 42% 55% 45%;
+}
+
+.forma--salvia {
+  width: 22%;
+  aspect-ratio: 1;
+  left: 6%;
+  bottom: 7%;
+  background: var(--verde-salvia);
+  border-radius: 58% 42% 48% 52%;
+}
+
+.marco {
+  position: relative;
+  overflow: hidden;
+  min-height: 13rem;
+  background: linear-gradient(155deg, var(--durazno), var(--beige-rose));
+}
+
+.marco img,
+.marco__reserva {
+  position: absolute;
+  inset: 0;
+}
+
+.marco img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.marco__dibujo {
+  position: absolute;
+  inset: 16% 18%;
+  width: auto;
+  height: auto;
+  color: var(--chocolate);
+  opacity: 0.38;
+}
+
+.marco__estado {
+  position: absolute;
+  left: 0.8rem;
+  bottom: 0.8rem;
+  z-index: 1;
+  max-width: calc(100% - 1.6rem);
+  padding: 0.4rem 0.7rem;
+  border-radius: 999px;
+  background: var(--crema);
+  color: var(--chocolate);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.marco--hero {
+  z-index: 1;
+  aspect-ratio: 4 / 5;
+  min-height: 16rem;
+  border-radius: 999px 999px 1.6rem 1.6rem;
+  background: linear-gradient(165deg, var(--durazno) 0%, var(--beige-rose) 48%, var(--terracota) 140%);
+}
+
+.marco--hero .marco__dibujo {
+  color: var(--crema);
+  opacity: 0.7;
+}
+
+.marco--alfajores {
+  aspect-ratio: 5 / 4;
+  border-radius: 1.4rem 2.6rem 1.4rem 2.2rem;
+}
+
+.marco--tortas {
+  aspect-ratio: 1;
+  border-radius: 2.4rem 1.2rem 2rem 1.2rem;
+  background: linear-gradient(200deg, var(--beige-rose), var(--durazno));
+}
+
+.marco--kuchen {
+  aspect-ratio: 1;
+  border-radius: 1.2rem 2rem;
+  background: linear-gradient(150deg, var(--beige-rose), var(--verde-salvia));
+}
+
+.marco--rollitos {
+  aspect-ratio: 1;
+  border-radius: 2rem 1.2rem 1.2rem 2.4rem;
+  background: linear-gradient(165deg, var(--durazno), var(--crema));
+}
+
+.marco--berlines,
+.marco--berlin {
+  aspect-ratio: 1;
+  border-radius: 1.5rem 1.5rem 2.6rem 1.2rem;
+  background: linear-gradient(180deg, var(--terracota), var(--durazno));
+}
+
+.marco--berlines .marco__dibujo,
+.marco--berlin .marco__dibujo {
+  color: var(--crema);
+  opacity: 0.65;
+}
+
+.marco--alfajor,
+.marco--torta,
+.marco--esencia {
+  aspect-ratio: 4 / 5;
+}
+
+.marco--alfajor { border-radius: 1.6rem 2.4rem 1.2rem 2rem; }
+.marco--torta {
+  border-radius: 2.5rem 1.3rem;
+  background: linear-gradient(190deg, var(--beige-rose), var(--durazno));
+}
+
+.marco--esencia {
+  border-radius: 999px 999px 1.5rem 1.5rem;
+  background: linear-gradient(165deg, var(--chocolate), var(--terracota) 55%, var(--durazno));
+}
+
+.marco--esencia .marco__dibujo {
+  color: var(--crema);
+  opacity: 0.55;
+}
+
+.marco.marco--muestra {
+  aspect-ratio: 4 / 5;
+}
+
+.seccion {
+  padding: 3.25rem 0;
+}
+
+.seccion__intro {
+  max-width: 38rem;
+  margin-bottom: 1.75rem;
+}
+
+.seccion__intro h2,
+.esencia__texto h2,
+.cotizacion h2 {
+  margin: 0;
+  font-size: clamp(2rem, 3vw + 1rem, 3.5rem);
+}
+
+.nota-seccion {
+  margin: 0.9rem 0 0;
+}
+
+.categorias__mosaico,
+.favoritos__grilla {
+  display: grid;
+  gap: 1.35rem;
+}
+
+.tarjeta-categoria h3,
+.tarjeta-muestra h3 {
+  margin: 0;
+  font-size: 1.55rem;
+}
+
+.tarjeta-categoria p,
+.tarjeta-muestra__texto p {
+  margin: 0.4rem 0 0;
+}
+
+.tarjeta-categoria__texto,
+.tarjeta-muestra__texto {
+  padding-top: 0.85rem;
+}
+
+.tarjeta-muestra__estado {
+  margin: 0 0 0.45rem;
+  color: var(--chocolate);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.favoritos {
+  background: var(--beige-rose);
+}
+
+.esencia__grilla {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.esencia__texto p:last-child {
+  margin: 1rem 0 0;
+  max-width: 36rem;
+}
+
+.cotizacion {
+  position: relative;
+  overflow: hidden;
+  padding: 3.5rem 0;
+  background: #4b392f;
+  color: var(--crema);
+}
+
+.cotizacion__caja {
+  position: relative;
+  z-index: 1;
+  max-width: 40rem;
+}
+
+.cotizacion .kicker { color: var(--crema); }
+.cotizacion .kicker span { color: var(--durazno); }
+
+.cotizacion p {
+  max-width: 32rem;
+  margin: 1rem 0 0;
+}
+
+.nota-accion--clara { color: var(--crema); }
+
+.cotizacion__forma {
+  position: absolute;
+  z-index: 0;
+  width: 16rem;
+  height: 16rem;
+  right: -2rem;
+  bottom: -7rem;
+  border-radius: 50%;
+  background: var(--durazno);
+  opacity: 0.16;
+  pointer-events: none;
+}
+
+.cotizacion a:focus-visible,
+.cotizacion button:focus-visible {
+  outline-color: var(--crema);
+}
+
+@media (min-width: 600px) {
+  .botones {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+}
+
+@media (min-width: 768px) {
+  .hero { padding: 3.5rem 0 4.5rem; }
+
+  .categorias__mosaico {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .tarjeta-categoria--alfajores {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: 1.25fr 0.85fr;
+    gap: 1.25rem;
+    align-items: end;
+  }
+
+  .tarjeta-categoria--alfajores .marco--alfajores {
+    aspect-ratio: 5 / 4;
+  }
+
+  .tarjeta-categoria--alfajores .tarjeta-categoria__texto {
+    padding: 0 0 0.4rem;
+  }
+
+  .favoritos__grilla {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .esencia__grilla {
+    grid-template-columns: 0.85fr 1.15fr;
+    gap: 3rem;
+    align-items: center;
+  }
+}
+
+@media (min-width: 1024px) {
+  .hero__grilla {
+    grid-template-columns: minmax(0, 1.08fr) minmax(18rem, 0.92fr);
+    gap: 3.5rem;
+    align-items: center;
+  }
+
+  .categorias__mosaico {
+    grid-template-columns: repeat(6, 1fr);
+    gap: 1.5rem;
+  }
+
+  .tarjeta-categoria--alfajores { grid-column: span 4; }
+  .tarjeta-categoria--tortas { grid-column: span 2; }
+  .tarjeta-categoria--kuchen,
+  .tarjeta-categoria--rollitos,
+  .tarjeta-categoria--berlines { grid-column: span 2; }
+
+  .favoritos__grilla {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .inicio-fotos {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .seccion { padding: 5rem 0; }
+  .cotizacion { padding: 5.25rem 0; }
+}
+
+@media (min-width: 1440px) {
+  .hero { padding-top: 4.25rem; }
+}
+
+.hero__collage {
+  display: grid;
+  grid-template-columns: 1.3fr 0.9fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 0.7rem;
+  min-height: 22rem;
+}
+
+.hero__collage img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 1.25rem;
+}
+
+.hero__collage img:first-child {
+  grid-row: 1 / span 2;
+}
+
+.inicio-foto {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.inicio-foto img {
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  border-radius: 1.25rem;
+}
+
+.inicio-foto h3 {
+  margin: 0;
+}
+
+.inicio-foto .boton {
+  align-self: flex-start;
+}
+
+
+/* Categorías reales del catálogo; sin altas ni cambios de productos. */
+.categorias__mosaico { grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr)); gap: 1.25rem; }
+.tarjeta-categoria { min-width: 0; border: 1px solid var(--beige-rose); border-radius: 1.25rem; overflow: hidden; background: var(--superficie); }
+.categoria-enlace { display: flex; flex-direction: column; height: 100%; color: inherit; text-decoration: none; }
+.categoria-enlace:hover h3 { color: var(--terracota); }
+.categoria-enlace:focus-visible { outline-offset: -4px; }
+.categoria-imagen { width: 100%; aspect-ratio: 4/3; object-fit: cover; }
+.categoria-imagen--vacia { display: grid; place-items: center; background: var(--beige-rose); color: var(--chocolate); font-family: var(--fuente-display); }
+.tarjeta-categoria__texto { padding: 1.25rem; }
+.categoria-explorar { display: flex; justify-content: space-between; gap: .75rem; margin-top: 1rem; color: var(--terracota); font-size: .9rem; font-weight: 700; }

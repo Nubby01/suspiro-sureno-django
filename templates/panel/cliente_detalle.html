@@ -1,0 +1,66 @@
+{% extends "panel/indice.html" %}
+
+{% block panel_cuerpo %}
+  <p><a class="interno-accion interno-accion--enlace ui-boton ui-boton--navegacion" href="{% url 'clientes_gestion' %}">Volver a clientes</a></p>
+  <dl class="ficha">
+    <div><dt>Nombre</dt><dd>{{ cliente.get_full_name|default:"Sin nombre" }}</dd></div>
+    <div><dt>Correo</dt><dd>{{ cliente.email }}</dd></div>
+    <div><dt>Teléfono</dt><dd>{% if cliente.telefono %}{{ cliente.telefono }}{% else %}Sin teléfono{% endif %}</dd></div>
+    <div><dt>Estado</dt><dd>{% if cliente.is_active %}Activa{% else %}Inactiva{% endif %}</dd></div>
+    <div><dt>Registro</dt><dd>{{ cliente.date_joined|date:"d-m-Y H:i" }}</dd></div>
+  </dl>
+  <section class="panel-bloque" aria-labelledby="titulo-cotizaciones">
+    <h2 id="titulo-cotizaciones">Cotizaciones</h2>
+    {% if cotizaciones %}
+      <div class="tabla-marco">
+        <table class="tabla-panel">
+          <thead>
+            <tr>
+              <th>Código</th>
+              <th>Estado</th>
+              <th>Fecha</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for cotizacion in cotizaciones %}
+              <tr>
+                <td data-etiqueta="Código"><a href="{% url 'cotizacion_gestion' cotizacion.codigo %}">{{ cotizacion.codigo }}</a></td>
+                <td data-etiqueta="Estado"><span class="estado estado--{{ cotizacion.estado }}">{{ cotizacion.get_estado_display }}</span></td>
+                <td data-etiqueta="Fecha">{{ cotizacion.creada|date:"d-m-Y" }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p>Esta clienta todavía no tiene cotizaciones.</p>
+    {% endif %}
+  </section>
+  <section class="panel-bloque" aria-labelledby="titulo-pedidos">
+    <h2 id="titulo-pedidos">Pedidos</h2>
+    {% if pedidos %}
+      <div class="tabla-marco">
+        <table class="tabla-panel">
+          <thead>
+            <tr>
+              <th>Código</th>
+              <th>Estado</th>
+              <th>Fecha</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for pedido in pedidos %}
+              <tr>
+                <td data-etiqueta="Código"><a href="{% url 'pedido_gestion' pedido.codigo %}">{{ pedido.codigo }}</a></td>
+                <td data-etiqueta="Estado"><span class="estado estado--{{ pedido.estado }}">{{ pedido.get_estado_display }}</span></td>
+                <td data-etiqueta="Fecha">{{ pedido.creada|date:"d-m-Y" }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p>Esta clienta todavía no tiene pedidos.</p>
+    {% endif %}
+  </section>
+{% endblock %}

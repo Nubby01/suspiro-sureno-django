@@ -1,0 +1,60 @@
+{% extends "panel/indice.html" %}
+{% load interfaz %}
+
+{% block panel_cuerpo %}
+  <section class="panel-bloque" aria-labelledby="titulo-alta">
+    <h2 id="titulo-alta">Crear ayudante</h2>
+    <p>La cuenta queda activa para el trabajo del taller. La contraseña se define aquí y no vuelve a mostrarse.</p>
+  <form class="panel-form formulario-amplio panel-form--secciones" method="post" novalidate>
+    {% csrf_token %}
+    {% if form.non_field_errors %}
+      <div class="mensaje-error" role="alert">{{ form.non_field_errors }}</div>
+    {% endif %}
+    {% for campo in form %}
+      <div class="campo{% if campo.widget_type == 'textarea' %} campo--ancho{% endif %}">
+        <label for="{{ campo.id_for_label }}">{{ campo.label }}</label>
+        {{ campo|campo_ui }}
+        {% if campo.help_text %}
+          <p class="ayuda">{{ campo.help_text }}</p>
+        {% endif %}
+        {% if campo.errors %}
+          <ul class="errorlist" role="alert">
+            {% for error in campo.errors %}<li>{{ error }}</li>{% endfor %}
+          </ul>
+        {% endif %}
+      </div>
+    {% endfor %}
+    <button class="panel-enviar ui-boton ui-boton--guardar" type="submit">Crear ayudante</button>
+  </form>
+  </section>
+
+  <section class="panel-bloque" aria-labelledby="titulo-personal">
+    <h2 id="titulo-personal">Personal autorizado</h2>
+    {% if personal %}
+      <div class="tabla-marco">
+        <table class="tabla-panel">
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Correo</th>
+              <th>Rol</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for persona in personal %}
+              <tr>
+                <td data-etiqueta="Nombre">{{ persona.get_full_name|default:persona.username }}</td>
+                <td data-etiqueta="Correo">{% if persona.email %}{{ persona.email }}{% else %}Sin correo{% endif %}</td>
+                <td data-etiqueta="Rol">{{ persona.get_rol_display }}</td>
+                <td data-etiqueta="Estado">{% if persona.is_active %}<span class="estado estado--activa">Activa</span>{% else %}<span class="estado estado--inactiva">Inactiva</span>{% endif %}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p>Todavía no hay personal autorizado.</p>
+    {% endif %}
+  </section>
+{% endblock %}

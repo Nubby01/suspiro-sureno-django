@@ -1,0 +1,89 @@
+{% extends "cuentas/_pagina.html" %}
+{% load interfaz %}
+{% load static %}
+
+{% block titulo %}Cotización · Suspiro Sureño{% endblock %}
+{% block clase_pagina %}cuenta-pagina--cotizar{% endblock %}
+
+{% block cuenta %}
+  <header class="cuenta-intro">
+    <p class="kicker">Cotización</p>
+    <h1>Solicitar cotización</h1>
+    <p>No hace falta una cuenta. Los precios pendientes se confirman antes de crear un pedido. No hay pago en línea.</p>
+  </header>
+
+  {% if lineas %}
+    <div class="cotizacion-layout">
+      <div class="cotizacion-principal">
+        <section aria-labelledby="titulo-productos">
+          <h2 id="titulo-productos">Productos seleccionados</h2>
+          {% for linea in lineas %}
+            <article class="linea-cotizacion">
+              {% if linea.imagen %}
+                <img src="{% static linea.imagen %}" alt="{{ linea.imagen_alt }}" width="96" height="96">
+              {% endif %}
+              <div>
+                <h3>{{ linea.nombre }}</h3>
+                {% if linea.variante %}<p>{{ linea.variante }}</p>{% endif %}
+                {% if linea.detalle %}<p>{{ linea.detalle }}</p>{% endif %}
+                <p>Precio {{ linea.precio }}</p>
+                <p>Subtotal {{ linea.importe }}</p>
+                <form method="post" class="linea-cotizacion__acciones">
+                  {% csrf_token %}
+                  <input type="hidden" name="accion" value="actualizar">
+                  <input type="hidden" name="indice" value="{{ linea.indice }}">
+                  <label for="cantidad-{{ linea.indice }}">{{ linea.cantidad_etiqueta }}
+                    <input id="cantidad-{{ linea.indice }}" type="number" name="cantidad" min="1" max="99" value="{{ linea.cantidad }}" required>
+                  </label>
+                  <button class="boton-cuenta boton-cuenta--secundario ui-boton ui-boton--contorno" type="submit">Actualizar cantidad</button>
+                  <button class="boton-cuenta boton-cuenta--aviso ui-boton ui-boton--aviso" type="submit" name="quitar" value="1">Quitar producto</button>
+                </form>
+              </div>
+            </article>
+          {% endfor %}
+        </section>
+
+        <form id="envio-cotizacion" class="cuenta-tarjeta cotizacion-contacto" method="post" novalidate>
+          {% csrf_token %}
+          <h2>Datos de contacto</h2>
+          {% if formulario.non_field_errors %}
+            <div class="mensaje-error" role="alert">{{ formulario.non_field_errors }}</div>
+          {% endif %}
+          {% for campo in formulario %}
+            <div class="campo{% if campo.widget_type == 'textarea' %} campo--ancho{% endif %}">
+              <label for="{{ campo.id_for_label }}">{{ campo.label }}</label>
+              {{ campo|campo_ui }}
+              {% if campo.errors %}
+                <ul class="errorlist" role="alert">{% for error in campo.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+              {% endif %}
+            </div>
+          {% endfor %}
+        </form>
+      </div>
+
+      <aside class="cotizacion-resumen" aria-labelledby="titulo-resumen">
+        <h2 id="titulo-resumen">Resumen</h2>
+          <p class="ayuda">Si eliges una caja, la cantidad indica cajas completas, no sus unidades interiores.</p>
+        <p>Líneas seleccionadas: {{ resumen.presentaciones }}. Presentaciones solicitadas: {{ resumen.piezas }}.</p>
+        {% if resumen.subtotal %}
+          <p>Subtotal con precio conocido: {{ resumen.subtotal }}</p>
+        {% endif %}
+        {% if resumen.pendientes %}
+          <p>{{ resumen.pendientes }} producto{{ resumen.pendientes|pluralize:"s" }} con precio pendiente.</p>
+          <p><strong>Total pendiente de confirmación</strong></p>
+        {% elif resumen.total %}
+          <p>Total estimado <strong>{{ resumen.total }}</strong></p>
+        {% endif %}
+        <button class="boton-cuenta ui-boton" type="submit" form="envio-cotizacion">Enviar cotización</button>
+{% if whatsapp_url %}        <a class="boton-cuenta boton-cuenta--secundario ui-boton ui-boton--whatsapp" href="{{ whatsapp_url }}" rel="noopener noreferrer">Consultar por WhatsApp</a>{% endif %}
+        <p class="ayuda">WhatsApp se abre para que confirmes el envío. La cotización solo queda guardada con «Enviar cotización».</p>
+      </aside>
+    </div>
+  {% else %}
+    <section class="estado-vacio">
+      <h2>La cotización está vacía</h2>
+      <p>Elige un dulce del catálogo para armar tu solicitud.</p>
+      <a class="boton-cuenta ui-boton" href="{% url 'catalogo' %}">Explorar catálogo</a>
+    </section>
+  {% endif %}
+{% endblock %}

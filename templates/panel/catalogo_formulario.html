@@ -1,0 +1,48 @@
+{% extends "panel/indice.html" %}
+{% load interfaz %}
+{% load static %}
+
+{% block panel_cuerpo %}
+  <p class="interno__acciones">
+    <a class="ui-boton ui-boton--navegacion" href="{% url 'catalogo_interno' %}">Volver al listado</a>
+    {% if producto %}
+      <a class="ui-boton ui-boton--navegacion" href="{% url 'catalogo_variantes' producto.id %}">Variantes y precios</a>
+      <a class="ui-boton ui-boton--navegacion" href="{% url 'catalogo_galeria' producto.id %}">Galería</a>
+    {% endif %}
+  </p>
+
+  {% if producto %}
+    <p>Precio de la variante predeterminada: {{ precio_texto }}. Se cambia en Variantes y precios.</p>
+    {% if foto.imagen %}
+      <img
+        class="interno__portada"
+        src="{% static foto.imagen %}"
+        alt="{{ foto.imagen_alt }}"
+        width="{{ foto.imagen_ancho }}"
+        height="{{ foto.imagen_alto }}"
+      >
+    {% endif %}
+  {% endif %}
+
+  <form class="panel-form formulario-amplio" method="post" novalidate>
+    {% csrf_token %}
+    {% if form.non_field_errors %}
+      <div class="mensaje-error" role="alert">{{ form.non_field_errors }}</div>
+    {% endif %}
+    {% for campo in form %}
+      <div class="campo {% if campo.widget_type == 'checkbox' %}campo--casilla{% endif %}">
+        <label for="{{ campo.id_for_label }}">{{ campo.label }}</label>
+        {{ campo|campo_ui }}
+        {% if campo.help_text %}
+          <p class="ayuda">{{ campo.help_text }}</p>
+        {% endif %}
+        {% if campo.errors %}
+          <ul class="errorlist" role="alert">
+            {% for error in campo.errors %}<li>{{ error }}</li>{% endfor %}
+          </ul>
+        {% endif %}
+      </div>
+    {% endfor %}
+    <button class="panel-enviar ui-boton" type="submit">{{ enviar }}</button>
+  </form>
+{% endblock %}

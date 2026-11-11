@@ -1,0 +1,48 @@
+{% extends "cuentas/_pagina.html" %}
+{% load interfaz %}
+{% load static %}
+
+{% block titulo %}Iniciar sesión · Suspiro Sureño{% endblock %}
+{% block descripcion %}Ingresa para revisar tus cotizaciones y pedidos.{% endblock %}
+
+{% block clase_pagina %}cuenta-pagina--acceso{% endblock %}
+{% block cuenta %}
+  <div class="cuenta-escena">
+    <figure class="cuenta-escena__foto">
+      <div class="cuenta-escena__marco">
+        <img src="{% static 'imagenes/rollosinicio.png' %}" alt="Rollos glaseados con limón, sobre una bandeja de madera.">
+      </div>
+    </figure>
+    <div class="cuenta-escena__formulario">
+      <div class="cuenta-acceso">
+        <header class="cuenta-intro">
+          <h1>Bienvenida de nuevo</h1>
+          <p>Ingresa para revisar tus cotizaciones y pedidos.</p>
+        </header>
+        <form class="cuenta-tarjeta" method="post">
+          {% csrf_token %}
+          {% if request.GET.next %}
+            <input type="hidden" name="next" value="{{ request.GET.next }}">
+          {% endif %}
+          {% if form.non_field_errors %}
+            <div class="mensaje-error" role="alert">{{ form.non_field_errors }}</div>
+          {% endif %}
+          {% for campo in form %}
+            <div class="campo{% if campo.widget_type == 'textarea' %} campo--ancho{% endif %}">
+              <label for="{{ campo.id_for_label }}">{{ campo.label }}</label>
+              {{ campo|campo_ui }}
+              {% if campo.help_text %}<p class="ayuda">{{ campo.help_text }}</p>{% endif %}
+              {% if campo.errors %}
+                <ul class="errorlist" role="alert">
+                  {% for error in campo.errors %}<li>{{ error }}</li>{% endfor %}
+                </ul>
+              {% endif %}
+            </div>
+          {% endfor %}
+          <button class="boton-cuenta ui-boton" type="submit">Iniciar sesión</button>
+        </form>
+        <p class="cuenta-alternativa"><a href="{% url 'registro' %}">Crear cuenta</a></p>
+      </div>
+    </div>
+  </div>
+{% endblock %}

@@ -1,0 +1,62 @@
+{% extends "panel/indice.html" %}
+
+{% block panel_cuerpo %}
+  <p class="interno__acciones">
+    <a class="interno-accion interno-accion--primaria ui-boton" href="{% url 'inventario_nuevo' %}">Nuevo insumo</a>
+    <a class="interno-accion interno-accion--secundaria ui-boton ui-boton--guardar" href="{% url 'inventario_entrada' %}">Registrar entrada</a>
+    <a class="interno-accion interno-accion--secundaria ui-boton ui-boton--guardar" href="{% url 'inventario_ajuste' %}">Registrar ajuste</a>
+    <a class="interno-accion interno-accion--enlace ui-boton ui-boton--navegacion" href="{% url 'inventario_movimientos' %}">Movimientos</a>
+    <a class="interno-accion interno-accion--enlace ui-boton ui-boton--navegacion" href="{% url 'inventario_recetas' %}">Recetas</a>
+  </p>
+  <form class="interno-filtros" method="get" role="search">
+    {% if incluir_demo %}<input type="hidden" name="incluir_demo" value="1">{% endif %}
+    <div class="interno-filtros__campo">
+      <label for="id_q">Buscar por nombre</label>
+      <input id="id_q" type="search" name="q" value="{{ busqueda }}" maxlength="120">
+    </div>
+    <div class="interno-filtros__campo">
+      <label for="id_aviso">Aviso</label>
+      <select id="id_aviso" name="aviso">
+        <option value="">Todos</option>
+        <option value="bajo" {% if aviso == "bajo" %}selected{% endif %}>Bajo el mínimo</option>
+      </select>
+    </div>
+    <button class="interno-filtros__buscar ui-boton" type="submit">Buscar</button>
+  </form>
+  <p>Insumos bajo el mínimo: {{ bajos }}.</p>
+  {% if insumos %}
+    <div class="tabla-marco">
+      <table class="tabla-panel">
+        <thead>
+          <tr>
+            <th>Insumo</th>
+            <th>Existencia</th>
+            <th>Unidad</th>
+            <th>Mínimo</th>
+            <th>Estado</th>
+            <th>Actualización</th>
+            <th>Acción</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for insumo in insumos %}
+            <tr>
+              <td data-etiqueta="Insumo">{{ insumo.nombre }}</td>
+              <td data-etiqueta="Existencia">{{ insumo.existencia }}</td>
+              <td data-etiqueta="Unidad">{{ insumo.get_unidad_display }}</td>
+              <td data-etiqueta="Mínimo">{{ insumo.stock_minimo }}</td>
+              <td data-etiqueta="Estado">
+                {% if "DEMO · " in insumo.nombre %}<span class="estado">Ejemplo de prueba</span>{% endif %}
+                <span class="estado stock--{{ insumo.nivel_stock }}">{{ insumo.etiqueta_stock }}</span>
+              </td>
+              <td data-etiqueta="Actualización">{{ insumo.actualizado|date:"d-m-Y H:i" }}</td>
+              <td data-etiqueta="Acción"><a class="interno-accion interno-accion--enlace ui-boton ui-boton--editar" href="{% url 'inventario_editar' insumo.pk %}">Editar</a> <a class="ui-boton ui-boton--secundario" href="{% url 'inventario_ficha' insumo.pk %}">Historial</a></td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p>Todavía no hay insumos registrados.</p>
+  {% endif %}
+{% endblock %}

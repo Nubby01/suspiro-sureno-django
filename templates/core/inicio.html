@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block titulo %}Suspiro Sureño{% endblock %}
+{% block estilos_extra %}
+  <link rel="stylesheet" href="{% static 'css/inicio.css' %}?v=inicio-secciones-whatsapp">
+{% endblock %}
+
+{% block cuerpo %}
+  {% include "core/_cabecera.html" %}
+
+  <main id="contenido">
+    <section class="hero" aria-labelledby="titulo-hero">
+      <div class="ancho hero__grilla">
+        <div class="hero__texto">
+          <p class="kicker">Repostería artesanal</p>
+          <h1 id="titulo-hero">Un dulce momento, hecho <em>especialmente</em> para ti</h1>
+          <p class="hero__bajada">En Suspiro Sureño preparamos dulces y repostería artesanal para acompañar tus momentos especiales.</p>
+          <div class="botones">
+            {% include "core/_boton.html" with boton=boton_catalogo variante="relleno" nota="nota-hero" %}
+            {% include "core/_boton.html" with boton=boton_cotizar variante="contorno" nota="nota-hero" %}
+          </div>
+          {% if not boton_catalogo.activo and not boton_cotizar.activo %}
+            <p class="nota-accion" id="nota-hero">El catálogo y la cotización todavía no están disponibles.</p>
+          {% elif not boton_catalogo.activo %}
+            <p class="nota-accion" id="nota-hero">El catálogo todavía no está disponible.</p>
+          {% elif not boton_cotizar.activo %}
+            <p class="nota-accion" id="nota-hero">La cotización todavía no está disponible en el sitio.</p>
+          {% endif %}
+        </div>
+        <div class="hero__visual">
+          <p class="hero__lugar">Punta Arenas</p>
+          <div class="hero__collage">
+            <img src="{% static 'imagenes/piedelimoninicio.png' %}" alt="Pie de limón de Suspiro Sureño" width="900" height="1100">
+            <img src="{% static 'imagenes/alfajorinicio.png' %}" alt="Alfajor de Suspiro Sureño" width="800" height="800">
+            <img src="{% static 'imagenes/rollosinicio.png' %}" alt="Rollos dulces de Suspiro Sureño" width="800" height="800">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="seccion categorias" aria-labelledby="titulo-categorias">
+      <div class="ancho">
+        <header class="seccion__intro">
+          <p class="kicker"><span>01</span> Categorías</p>
+          <h2 id="titulo-categorias">Descubre nuestras delicias</h2>
+          <p>Encuentra algo rico para compartir, celebrar o disfrutar a tu manera.</p>
+        </header>
+        <div class="categorias__mosaico">
+          {% for categoria in categorias %}
+            {% include "core/_tarjeta_categoria.html" %}
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+
+    <section class="seccion favoritos" aria-labelledby="titulo-favoritos">
+      <div class="ancho">
+        <header class="seccion__intro">
+          <p class="kicker"><span>02</span> Para disfrutar</p>
+          <h2 id="titulo-favoritos">Dulces que invitan a compartir</h2>
+        </header>
+        <div class="favoritos__grilla inicio-fotos">
+          <article class="inicio-foto">
+            <img src="{% static 'imagenes/piedelimoninicio.png' %}" alt="Pie de limón" width="800" height="900">
+            <h3>Pie de limón</h3>
+            <a class="boton boton--contorno ui-boton ui-boton--contorno" href="{% url 'catalogo' %}#categoria-pies-y-kuchenes">Ver en el catálogo</a>
+          </article>
+          <article class="inicio-foto">
+            <img src="{% static 'imagenes/alfajorinicio.png' %}" alt="Alfajor" width="800" height="800">
+            <h3>Alfajores</h3>
+            <a class="boton boton--contorno ui-boton ui-boton--contorno" href="{% url 'catalogo' %}#categoria-alfajores">Ver en el catálogo</a>
+          </article>
+          <article class="inicio-foto">
+            <img src="{% static 'imagenes/rollosinicio.png' %}" alt="Rollos dulces" width="800" height="800">
+            <h3>Rollos</h3>
+            <a class="boton boton--contorno ui-boton ui-boton--contorno" href="{% url 'catalogo' %}#categoria-rollos-dulces">Ver en el catálogo</a>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="seccion esencia" aria-labelledby="titulo-esencia">
+      <div class="ancho esencia__grilla">
+        <img class="esencia-foto" src="{% static 'imagenes/alfajorinicio.png' %}" alt="Detalle de un alfajor de Suspiro Sureño" width="800" height="800" loading="lazy">
+        <div class="esencia__texto">
+          <p class="kicker"><span>03</span> Nuestra esencia</p>
+          <h2 id="titulo-esencia">Hecho con cariño, desde Punta Arenas</h2>
+          <p>Preparamos dulces y repostería de forma artesanal, en Punta Arenas. Cuidamos cada preparación para que disfrutes sabores que dan ganas de compartir.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="cotizacion" aria-labelledby="titulo-cotizacion">
+      <span class="cotizacion__forma" aria-hidden="true"></span>
+      <div class="ancho cotizacion__caja">
+        <p class="kicker"><span>04</span> Pedido a medida</p>
+        <h2 id="titulo-cotizacion">¿Tienes algo especial en mente?</h2>
+        <p>Cuéntanos qué te gustaría preparar para esa ocasión especial y solicita tu cotización.</p>
+        <div class="botones">
+          {% include "core/_boton.html" with boton=boton_cotizar variante="durazno" nota="nota-cotizacion" %}
+          {% if negocio.whatsapp_consulta %}
+            <a class="boton boton--durazno ui-boton ui-boton--secundario" href="{{ negocio.whatsapp_consulta }}" rel="noopener noreferrer">Cotizar por WhatsApp</a>
+          {% endif %}
+        </div>
+        {% if not boton_cotizar.activo %}
+          <p class="nota-accion nota-accion--clara" id="nota-cotizacion">La cotización todavía no está disponible en el sitio.</p>
+        {% endif %}
+      </div>
+    </section>
+  </main>
+
+  {% include "core/_pie.html" %}
+{% endblock %}

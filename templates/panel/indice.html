@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block titulo %}{{ panel.titulo }} · Suspiro Sureño{% endblock %}
+{% block descripcion %}{{ panel.introduccion }}{% endblock %}
+
+{% block estilos_extra %}
+  <link rel="stylesheet" href="{% static 'css/panel.css' %}?v=alertas-stock-2">
+{% endblock %}
+
+{% block cuerpo %}
+  <div class="panel">
+    <header class="panel-barra">
+      <div class="panel-barra__marca">
+        {% include "core/_marca.html" %}
+      </div>
+      <button type="button" class="panel-toggle" data-panel-toggle aria-expanded="false" aria-controls="panel-nav">
+        <span class="panel-toggle__icono" aria-hidden="true"></span>
+        <span data-panel-texto>Menú</span>
+      </button>
+      {% if alertas_inventario != None %}
+      <details class="panel-notificaciones" data-alertas-url="{% url 'alertas_stock' %}">
+        <summary aria-label="Alertas de inventario: {{ alertas_inventario|length }}">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M9 20a3 3 0 0 0 6 0"/></svg>
+          <span class="panel-notificaciones__contador" aria-hidden="true" {% if not alertas_inventario %}hidden{% endif %}>{{ alertas_inventario|length }}</span>
+          {% if request.resolver_match.url_name == "gestion" and alertas_inventario %}<span class="panel-notificaciones__aviso">Hay {{ alertas_inventario|length }} insumos sin stock o en nivel crítico. Revisa las alertas.</span>{% endif %}
+        </summary>
+        <section class="panel-notificaciones__lista" aria-label="Notificaciones de stock">
+          {% include "panel/_alertas_stock.html" %}
+        </section>
+      </details>
+      {% endif %}
+      <form class="panel-salir" method="post" action="{% url 'salir' %}">
+        {% csrf_token %}
+        <button class="ui-boton ui-boton--aviso" type="submit">Cerrar sesión</button>
+      </form>
+    </header>
+    <div class="panel-cuerpo">
+      <nav id="panel-nav" class="panel-nav panel-nav--cerrado" aria-label="{{ panel.kicker }}">
+        <p class="panel-nav__titulo">{{ panel.kicker }}</p>
+        <ul>
+          {% for modulo in panel.modulos %}
+            <li>
+              {% if modulo.disponible %}
+                <a href="{% url modulo.ruta %}" {% if seccion_panel == modulo.ruta %}aria-current="page"{% endif %}>{{ modulo.etiqueta }}</a>
+              {% else %}
+                <span class="panel-nav__pendiente">
+                  {{ modulo.etiqueta }}
+                  <span class="panel-estado">Pendiente</span>
+                </span>
+              {% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+      </nav>
+      <main id="contenido" class="panel-main">
+        <header class="panel-intro">
+          <p class="kicker">{{ panel.kicker }}</p>
+          <h1>{{ panel.titulo }}</h1>
+          <p>{{ panel.introduccion }}</p>
+          {% if cuenta.get_full_name %}
+            <p>Sesión de {{ cuenta.get_full_name }}.</p>
+          {% endif %}
+        </header>
+        {% include "core/_avisos.html" %}
+        {% if demo_filtro %}<form method="get" class="demo-filtro">
+          {% for clave, valor in request.GET.items %}{% if clave != "incluir_demo" %}<input type="hidden" name="{{ clave }}" value="{{ valor }}">{% endif %}{% endfor %}
+          <label><input type="checkbox" name="incluir_demo" value="1" {% if incluir_demo %}checked{% endif %}> Mostrar registros de demostración</label><button class="ui-boton ui-boton--navegacion" type="submit">Aplicar</button>
+          <p class="ayuda">Los ejemplos marcados se ocultan por defecto; sus registros y relaciones se conservan.</p>
+        </form>{% endif %}
+        {% block panel_cuerpo %}
+        {% if resumen %}
+          <section class="indicadores" aria-label="Indicadores">
+            <a class="indicador" href="{% url 'cotizaciones_gestion' %}">
+              <span>Cotizaciones abiertas</span>
+              <strong>{{ resumen.cotizaciones_abiertas }}</strong>
+            </a>
+            <a class="indicador" href="{% url 'pedidos_gestion' %}?estado=recibido">
+              <span>Pedidos recibidos</span>
+              <strong>{{ resumen.pedidos.recibido }}</strong>
+            </a>
+            <a class="indicador" href="{% url 'pedidos_gestion' %}?estado=en_preparacion">
+              <span>En preparación</span>
+              <strong>{{ resumen.pedidos.en_preparacion }}</strong>
+            </a>
+            <a class="indicador" href="{% url 'pedidos_gestion' %}?estado=listo">
+              <span>Listos</span>
+              <strong>{{ resumen.pedidos.listo }}</strong>
+            </a>
+            <a class="indicador" href="{% url 'pedidos_gestion' %}?estado=entregado">
+              <span>Entregados</span>
+              <strong>{{ resumen.pedidos.entregado }}</strong>
+            </a>
+            <a class="indicador" href="{% url 'inventario_gestion' %}?aviso=bajo">
+              <span>Insumos bajo mínimo</span>
+              <strong>{{ resumen.bajos }}</strong>
+            </a>
+          </section>
+          {% if resumen.alertas_stock %}<section class="panel-alertas" aria-label="Alertas de stock"><h2>Insumos que requieren atención</h2><ul class="panel-compacta">{% for insumo in resumen.alertas_stock %}<li><span>{{ insumo.nombre }}</span><a class="ui-boton ui-boton--navegacion" href="{% url 'inventario_ficha' insumo.pk %}">Ver insumo</a><strong>{{ insumo.existencia }} {{ insumo.get_unidad_display }}</strong><span class="estado stock--{{ insumo.nivel_stock }}">{{ insumo.etiqueta_stock }}</span></li>{% endfor %}</ul></section>{% endif %}
+          <nav class="acciones-rapidas" aria-label="Accesos rápidos">
+            <a class="ui-boton" href="{% url 'cotizaciones_gestion' %}">Revisar cotizaciones</a>
+            <a class="ui-boton ui-boton--navegacion" href="{% url 'produccion_gestion' %}">Ver producción</a>
+            <a class="ui-boton ui-boton--guardar" href="{% url 'inventario_entrada' %}">Registrar abastecimiento</a>
+          </nav>
+          <div class="panel-dos">
+            <section>
+              <h2>Pedidos recientes</h2>
+              {% if resumen.recientes %}
+                <ul class="panel-compacta">
+                  {% for pedido in resumen.recientes %}
+                    <li>
+                      <a class="ui-boton ui-boton--navegacion" href="{% url 'pedido_gestion' pedido.codigo %}">{{ pedido.codigo }}</a>
+                      <span>{{ pedido.nombre }}</span>
+                      <span class="estado estado--{{ pedido.estado }}">{{ pedido.get_estado_display }}</span>
+                    </li>
+                  {% endfor %}
+                </ul>
+              {% else %}
+                <p>Todavía no hay pedidos comerciales.</p>
+              {% endif %}
+            </section>
+            <section>
+              <h2>Productos más solicitados</h2>
+              {% if resumen.solicitados %}
+                <ul class="panel-compacta">
+                  {% for item in resumen.solicitados %}
+                    <li><span>{{ item.nombre_producto }}</span> <strong>{{ item.total }}</strong></li>
+                  {% endfor %}
+                </ul>
+              {% else %}
+                <p>Todavía no hay productos solicitados en cotizaciones comerciales.</p>
+              {% endif %}
+            </section>
+          </div>
+          {% if resumen.demo_pedidos or resumen.demo_cotizaciones %}
+            <p class="ayuda">Hay {{ resumen.demo_cotizaciones }} cotizaciones y {{ resumen.demo_pedidos }} pedidos marcados como demostración. No entran en estos indicadores.</p>
+          {% endif %}
+        {% endif %}
+        <ul class="panel-lista">
+          {% for modulo in panel.modulos %}
+            {% if not modulo.disponible %}
+              <li>
+                <h2>{{ modulo.etiqueta }}</h2>
+                <p>Pendiente. Este módulo todavía no está disponible.</p>
+              </li>
+            {% endif %}
+          {% endfor %}
+        </ul>
+        {% endblock %}
+      </main>
+    </div>
+  </div>
+{% endblock %}
+
+{% block scripts %}
+  <script src="{% static 'js/panel.js' %}?v=alertas-stock-3"></script>
+{% endblock %}

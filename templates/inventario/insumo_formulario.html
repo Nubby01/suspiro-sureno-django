@@ -1,0 +1,28 @@
+{% extends "panel/indice.html" %}
+{% load interfaz %}
+
+{% block panel_cuerpo %}
+  <p class="interno__acciones"><a class="ui-boton ui-boton--navegacion" href="{% url 'inventario_gestion' %}">Volver al inventario</a></p>
+  {% if insumo %}<p><a class="ui-boton ui-boton--navegacion" href="{% url 'inventario_ficha' insumo.pk %}">Ver historial de abastecimientos</a></p>{% endif %}
+  <form class="panel-form formulario-amplio" method="post" novalidate>
+    {% csrf_token %}
+    {% if formulario.non_field_errors %}
+      <div class="mensaje-error" role="alert">{{ formulario.non_field_errors }}</div>
+    {% endif %}
+    {% for campo in formulario %}
+      {% if campo.is_hidden %}
+        {{ campo|campo_ui }}
+      {% else %}
+        <div class="campo{% if campo.field.widget.input_type == 'checkbox' %} campo--casilla{% endif %}">
+          <label for="{{ campo.id_for_label }}">{{ campo.label }}</label>
+          {{ campo|campo_ui }}
+          {% if campo.help_text %}<p class="ayuda">{{ campo.help_text }}</p>{% endif %}
+          {% if campo.errors %}
+            <ul class="errorlist" role="alert">{% for error in campo.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+          {% endif %}
+        </div>
+      {% endif %}
+    {% endfor %}
+    <button class="panel-enviar ui-boton" type="submit">{{ envio|default:"Guardar" }}</button>
+  </form>
+{% endblock %}

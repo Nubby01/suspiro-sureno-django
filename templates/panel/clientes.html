@@ -1,0 +1,44 @@
+{% extends "panel/indice.html" %}
+
+{% block panel_cuerpo %}
+  <form class="interno-filtros" method="get" role="search">
+    {% if incluir_demo %}<input type="hidden" name="incluir_demo" value="1">{% endif %}
+    <div class="interno-filtros__campo">
+      <label for="id_q">Buscar por nombre o correo</label>
+      <input id="id_q" type="search" name="q" value="{{ busqueda }}" maxlength="120">
+    </div>
+    <button class="interno-filtros__buscar ui-boton" type="submit">Buscar</button>
+  </form>
+  {% if clientes %}
+    <div class="tabla-marco">
+      <table class="tabla-panel">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Correo</th>
+            <th>Teléfono</th>
+            <th>Estado</th>
+            <th>Registro</th>
+            <th>Acción</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for cliente in clientes %}
+            <tr>
+              <td data-etiqueta="Nombre">{{ cliente.get_full_name|default:"Sin nombre" }}</td>
+              <td data-etiqueta="Correo">{{ cliente.email }}</td>
+              <td data-etiqueta="Teléfono">{% if cliente.telefono %}{{ cliente.telefono }}{% else %}Sin teléfono{% endif %}</td>
+              <td data-etiqueta="Estado">{% if cliente.is_active %}<span class="estado estado--activa">Activa</span>{% else %}<span class="estado estado--inactiva">Inactiva</span>{% endif %}</td>
+              <td data-etiqueta="Registro">{{ cliente.date_joined|date:"d-m-Y" }}</td>
+              <td data-etiqueta="Acción"><a class="interno-accion interno-accion--enlace ui-boton ui-boton--navegacion" href="{% url 'cliente_detalle' cliente.pk %}">Ver cliente</a></td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% elif busqueda %}
+    <p>No hay clientas que coincidan con la búsqueda.</p>
+  {% else %}
+    <p>Todavía no hay clientes registrados.</p>
+  {% endif %}
+{% endblock %}

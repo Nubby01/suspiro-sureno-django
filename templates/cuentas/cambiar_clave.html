@@ -1,0 +1,33 @@
+{% extends "cuentas/_pagina.html" %}
+{% load interfaz %}
+
+{% block titulo %}Cambiar contraseña · Suspiro Sureño{% endblock %}
+{% block descripcion %}Cambia la contraseña de tu propia cuenta.{% endblock %}
+
+{% block cuenta %}
+  <header class="cuenta-intro">
+    <p class="kicker">Cuenta</p>
+    <h1>Cambiar contraseña</h1>
+    <p>La nueva clave reemplaza solo la de esta sesión. No modifica otras cuentas.</p>
+  </header>
+  <form class="cuenta-tarjeta" method="post" novalidate>
+    {% csrf_token %}
+    {% if form.non_field_errors %}
+      <div class="mensaje-error" role="alert">{{ form.non_field_errors }}</div>
+    {% endif %}
+    {% for campo in form %}
+      <div class="campo{% if campo.widget_type == 'textarea' %} campo--ancho{% endif %}">
+        <label for="{{ campo.id_for_label }}">{{ campo.label }}</label>
+        {{ campo|campo_ui }}
+        {% if campo.help_text %}<p class="ayuda" id="ayuda-{{ campo.name }}">{{ campo.help_text }}</p>{% endif %}
+        {% if campo.errors %}
+          <ul class="errorlist" role="alert">
+            {% for error in campo.errors %}<li>{{ error }}</li>{% endfor %}
+          </ul>
+        {% endif %}
+      </div>
+    {% endfor %}
+    <button class="boton-cuenta ui-boton" type="submit">Guardar contraseña</button>
+  </form>
+  <p class="cuenta-alternativa"><a href="{% url 'mi_cuenta' %}">Volver a mi cuenta</a></p>
+{% endblock %}

@@ -1,0 +1,566 @@
+body:has(.cuenta-pagina) {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.cuenta-pagina {
+  flex: 1 0 auto;
+  padding: 2.25rem 0 4rem;
+}
+
+.cuenta-pagina--acceso {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  background: var(--crema);
+}
+
+.cuenta-pagina--acceso .ancho {
+  display: flex;
+  flex: 1 0 auto;
+  flex-direction: column;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+}
+
+.cuenta-escena {
+  display: flex;
+  flex: 1 0 auto;
+  flex-direction: column;
+  justify-content: safe center;
+  gap: 1.15rem;
+  width: 100%;
+  padding: 1.25rem 1rem 2.25rem;
+}
+
+.cuenta-escena__foto {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  width: min(32.5rem, 100%);
+  margin-inline: auto;
+}
+
+.cuenta-escena__marco {
+  display: contents;
+}
+
+.cuenta-escena__foto img {
+  width: 4.5rem;
+  height: 4.5rem;
+  flex: 0 0 auto;
+  border-radius: 0.95rem;
+  object-fit: cover;
+}
+
+.cuenta-escena__foto figcaption {
+  margin: 0;
+  color: var(--chocolate);
+  font-family: var(--fuente-display);
+  font-size: 1.35rem;
+  line-height: 1.2;
+}
+
+.cuenta-escena__formulario {
+  min-width: 0;
+}
+
+.cuenta-acceso {
+  width: min(32.5rem, 100%);
+  margin-inline: auto;
+  text-align: left;
+}
+
+.cuenta-acceso .cuenta-intro h1,
+.cuenta-acceso .cuenta-intro p,
+.cuenta-acceso .cuenta-alternativa {
+  max-width: none;
+}
+
+.cuenta-acceso .cuenta-tarjeta {
+  width: 100%;
+  margin-top: 1.25rem;
+  padding: 0;
+  background: transparent;
+  border-radius: 0;
+}
+
+.etiqueta-opcional {
+  font-weight: 500;
+  color: rgba(53, 40, 33, 0.72);
+}
+
+.cuenta-seccion {
+  margin-top: 2.25rem;
+}
+
+.cuenta-seccion h2 {
+  margin: 0 0 0.5rem;
+  font-size: clamp(1.6rem, 1vw + 1.2rem, 2.1rem);
+}
+
+.cuenta-pagina h1,
+.cuenta-pagina h2 {
+  margin: 0;
+  font-family: var(--fuente-display);
+  font-weight: 400;
+  letter-spacing: -0.03em;
+  line-height: 1.12;
+}
+
+.cuenta-intro h1,
+.cuenta-vacia h1 {
+  font-size: clamp(2.15rem, 3vw + 1.2rem, 3.6rem);
+  max-width: 12em;
+}
+
+.cuenta-pagina .kicker {
+  margin: 0 0 0.85rem;
+  color: var(--chocolate);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.cuenta-intro p,
+.cuenta-alternativa,
+.cuenta-dato,
+.cuenta-nota {
+  max-width: 36rem;
+  margin: 1rem 0 0;
+}
+
+.cuenta-tarjeta {
+  width: min(32rem, 100%);
+  margin-top: 1.5rem;
+  padding: 1.15rem 1.1rem 1.35rem;
+  background: var(--superficie);
+  border-radius: 1.4rem;
+}
+
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-top: 1rem;
+}
+
+.campo label {
+  font-weight: 600;
+}
+
+.entrada {
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0.55rem 0.75rem;
+  border: 1.5px solid var(--beige-rose);
+  border-radius: 0.8rem;
+  background: #fffdf9;
+  color: var(--chocolate);
+  font: inherit;
+}
+
+.entrada:focus-visible {
+  outline: 2px solid var(--terracota);
+  outline-offset: 2px;
+  border-color: var(--chocolate);
+}
+
+.ayuda,
+.campo .errorlist,
+.mensaje-error {
+  margin: 0;
+  color: var(--chocolate);
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.campo .errorlist,
+.mensaje-error {
+  padding: 0;
+  color: var(--error);
+  list-style: none;
+}
+
+.boton-cuenta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 3rem;
+  margin-top: 1.25rem;
+  padding: 0.75rem 1.3rem;
+  border: 1.5px solid transparent;
+  border-radius: 999px;
+  background: var(--terracota);
+  color: var(--crema);
+  font-family: var(--fuente);
+  font-size: 0.98rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.boton-cuenta:hover {
+  background: var(--chocolate);
+}
+
+.cuenta-alternativa a,
+.cuenta-volver {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  color: var(--terracota);
+  font-weight: 600;
+}
+
+.cuenta-lista {
+  width: min(32rem, 100%);
+  margin: 1.25rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cuenta-lista li {
+  display: grid;
+  gap: 0.15rem;
+  padding: 0.85rem 0;
+  border-top: 1px solid var(--beige-rose);
+}
+
+.cuenta-lista span {
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+@media (min-width: 768px) {
+  .cuenta-pagina {
+    padding-top: 3rem;
+  }
+
+  .cuenta-pagina--acceso {
+    padding-top: 0;
+  }
+
+  .cuenta-pagina--acceso,
+  .cuenta-pagina--acceso .ancho,
+  .cuenta-escena {
+    flex: 1 1 0%;
+    min-height: auto;
+  }
+
+  .cuenta-escena {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 45fr) minmax(0, 55fr);
+    grid-template-rows: minmax(0, 1fr);
+    align-items: stretch;
+    gap: 0;
+    padding: 0;
+  }
+
+  .cuenta-escena__foto {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 45%;
+    display: block;
+    height: auto;
+    min-height: 0;
+    margin: 0;
+  }
+
+  .cuenta-escena__marco {
+    display: block;
+    position: sticky;
+    top: calc(4.25rem + 1rem);
+    height: calc(100% - 2rem);
+    max-height: calc(100vh - 4.25rem - 2rem);
+    margin: 1rem;
+    border-radius: 1.6rem;
+    overflow: hidden;
+    background: #e3d6c5;
+  }
+
+  .cuenta-escena__formulario {
+    grid-column: 2;
+    grid-row: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: safe center;
+    min-height: 100%;
+    padding: clamp(2rem, 5vh, 3.5rem) clamp(1.5rem, 4vw, 3.5rem);
+  }
+
+  .cuenta-escena__foto img {
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+    object-fit: cover;
+    object-position: center;
+  }
+
+  .cuenta-escena__foto figcaption {
+    position: absolute;
+    left: 1.1rem;
+    right: 1.1rem;
+    bottom: 1.1rem;
+    padding: 0.8rem 1rem;
+    border-radius: 0.85rem;
+    background: rgba(53, 40, 33, 0.72);
+    color: #f7f1e8;
+    font-size: clamp(1.25rem, 1.4vw, 1.7rem);
+  }
+}
+
+.boton-cuenta--secundario {
+  background: transparent;
+  color: var(--chocolate);
+  border-color: var(--beige-rose);
+  text-decoration: none;
+}
+
+.boton-cuenta--secundario:hover {
+  background: var(--beige-rose);
+  color: var(--chocolate);
+}
+
+.boton-cuenta--aviso {
+  width: auto;
+  margin-top: 0;
+  background: transparent;
+  color: #8a3412;
+  border-color: transparent;
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+}
+
+.boton-cuenta--aviso:hover {
+  background: transparent;
+  color: var(--chocolate);
+}
+
+.aviso {
+  margin: 1rem 0 0;
+  padding: 0.8rem 1rem;
+  border-radius: 0.9rem;
+  background: #e7efe4;
+  color: var(--chocolate);
+}
+
+.aviso p {
+  margin: 0;
+}
+
+.cotizacion-layout {
+  display: grid;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.cotizacion-principal {
+  display: grid;
+  gap: 1rem;
+  min-width: 0;
+}
+
+.cotizacion-contacto,
+.cuenta-pagina--cotizar .cuenta-tarjeta,
+.cuenta-pagina--cuenta .cuenta-tarjeta {
+  width: 100%;
+  max-width: none;
+}
+
+.linea-cotizacion {
+  display: grid;
+  grid-template-columns: 5.5rem minmax(0, 1fr);
+  gap: 0.9rem;
+  margin-top: 0.8rem;
+  padding: 0.9rem 0;
+  border-top: 1px solid var(--beige-rose);
+}
+
+.linea-cotizacion img {
+  width: 5.5rem;
+  height: 5.5rem;
+  object-fit: cover;
+  border-radius: 0.9rem;
+}
+
+.linea-cotizacion h3,
+.linea-cotizacion p {
+  margin: 0.15rem 0;
+}
+
+.linea-cotizacion__acciones {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 0.6rem;
+  margin-top: 0.6rem;
+}
+
+.linea-cotizacion__acciones label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-weight: 600;
+}
+
+.linea-cotizacion__acciones input {
+  width: 5rem;
+  min-height: 2.75rem;
+  padding: 0.4rem 0.6rem;
+  border: 1.5px solid var(--beige-rose);
+  border-radius: 0.7rem;
+  background: var(--crema);
+}
+
+.linea-cotizacion__acciones .boton-cuenta {
+  width: auto;
+  margin-top: 0;
+}
+
+.cotizacion-resumen {
+  padding: 1.1rem;
+  border: 1.5px solid var(--beige-rose);
+  border-radius: 1.2rem;
+  background: rgba(227, 214, 197, 0.35);
+}
+
+.cotizacion-resumen h2,
+.cotizacion-acciones {
+  margin-top: 0;
+}
+
+.cotizacion-acciones {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.estado-vacio {
+  margin-top: 1.5rem;
+  padding: 1.5rem 0;
+}
+
+.cuenta-columnas {
+  display: grid;
+  gap: 1.25rem;
+  margin-top: 1rem;
+}
+
+@media (min-width: 900px) {
+  .cotizacion-layout {
+    grid-template-columns: minmax(0, 1.6fr) minmax(16rem, 22rem);
+    align-items: start;
+  }
+
+  .cotizacion-resumen {
+    position: sticky;
+    top: 5.5rem;
+  }
+
+  .cuenta-pagina--cuenta .cuenta-columnas {
+    grid-template-columns: minmax(0, 1.2fr) minmax(16rem, 0.9fr);
+  }
+}
+
+.tabla-marco {
+  width: 100%;
+  min-width: 0;
+}
+
+.tabla-panel {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tabla-panel th,
+.tabla-panel td {
+  padding: 0.75rem 0.55rem;
+  border-bottom: 1px solid var(--beige-rose);
+  text-align: left;
+  vertical-align: top;
+}
+
+.tabla-panel th {
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.estado {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.7rem;
+  padding: 0.1rem 0.55rem;
+  border-radius: 999px;
+  background: var(--beige-rose);
+  color: var(--chocolate);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+@media (max-width: 767px) {
+  .tabla-panel thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+
+  .tabla-panel,
+  .tabla-panel tbody,
+  .tabla-panel tr,
+  .tabla-panel td {
+    display: block;
+    width: 100%;
+  }
+
+  .tabla-panel tr {
+    margin-bottom: 0.8rem;
+    padding: 0.35rem 0.2rem 0.6rem;
+    border: 1px solid var(--beige-rose);
+    border-radius: 1rem;
+  }
+
+  .tabla-panel td {
+    border: 0;
+    padding: 0.35rem 0.7rem;
+  }
+
+  .tabla-panel td::before {
+    content: attr(data-etiqueta);
+    display: block;
+    margin-bottom: 0.1rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+}
+
+/* Cuenta: datos y seguridad en tarjetas independientes. */
+.cuenta-atajos { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem; margin-top: 1.5rem; }
+.cuenta-pagina--cuenta .cuenta-columnas > .cuenta-seccion { margin-top: .75rem; padding: 1.25rem; min-width: 0; border: 1px solid var(--beige-rose); border-radius: 1.25rem; background: var(--superficie); }
+.cuenta-pagina--cuenta .cuenta-tarjeta { padding: 0; margin-top: 1rem; }
+.cuenta-pagina--cuenta .cuenta-lista { width: 100%; display: flex; flex-wrap: wrap; gap: 1.5rem; }
+.cuenta-pagina--cuenta .cuenta-lista li { border: 0; }
+.cuenta-acceso { padding: 1.5rem; border: 1px solid var(--beige-rose); border-radius: 1.5rem; background: #fffdf9; box-shadow: 0 10px 30px #35282107; }
+.cuenta-alternativa { text-align: center; }
+.cuenta-tarjeta .campo:first-of-type { margin-top: .5rem; }
+.cotizacion-acciones { flex-direction: row; flex-wrap: wrap; align-items: center; margin-top: 1.25rem; }
+.cotizacion-acciones .boton-cuenta { width: auto; margin: 0; }
+.linea-cotizacion--texto { grid-template-columns: minmax(0, 1fr); padding: 1rem; background: #fffdf9; border: 1px solid var(--beige-rose); border-radius: 1rem; }
+@media (max-width: 767px) {
+  .cuenta-escena__foto { display: none; }
+  .cuenta-acceso { padding: 1.25rem; }
+  .cuenta-atajos > a, .cotizacion-acciones > a { flex: 1 1 12rem; }
+}

@@ -1,0 +1,29 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block titulo %}Suspiro Sureño{% endblock %}</title>
+  <meta name="description" content="{% block descripcion %}Dulces y repostería artesanal de Suspiro Sureño, en Punta Arenas.{% endblock %}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,600;1,400&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/tokens.css' %}">
+  <link rel="stylesheet" href="{% static 'css/base.css' %}?v=b13-final">
+  {% block estilos_extra %}{% endblock %}
+  <link rel="stylesheet" href="{% static 'css/controles.css' %}?v=calendario-estados-2">
+  <script>document.documentElement.classList.add("js");</script>
+</head>
+<body>
+  <a class="saltar" href="#contenido">Saltar al contenido</a>
+  {% block cuerpo %}{% endblock %}
+  {% include "core/_volver_arriba.html" %}
+  <script src="{% static 'js/nav.js' %}?v=b13-final"></script>
+  <script src="{% static 'js/volver.js' %}"></script>
+  <script src="{% static 'js/interfaz.js' %}?v=avisos-temporales-2"></script>
+  <script src="{% static 'js/selectores.js' %}?v=b13-selectores-globales"></script>
+  <script src="{% static 'js/calendario.js' %}?v=calendario-estados-2"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

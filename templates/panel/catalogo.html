@@ -1,0 +1,72 @@
+{% extends "panel/indice.html" %}
+{% load static %}
+
+{% block panel_cuerpo %}
+  <p class="interno__acciones">
+    <a class="ui-boton ui-boton--navegacion" href="{% url 'catalogo_nuevo' %}">Nuevo producto</a>
+  </p>
+
+  <form class="interno-filtros" method="get" role="search">
+    {% if incluir_demo %}<input type="hidden" name="incluir_demo" value="1">{% endif %}
+    <div class="interno-filtros__campo">
+      <label for="id_q">Buscar por nombre</label>
+      <input id="id_q" type="search" name="q" value="{{ busqueda }}" maxlength="120" autocomplete="off">
+    </div>
+    <div class="interno-filtros__campo">
+      <label for="id_categoria">Categoría</label>
+      <select id="id_categoria" name="categoria">
+        <option value="">Todas las categorías</option>
+        {% for categoria in categorias %}
+          <option value="{{ categoria.slug }}" {% if categoria.slug == categoria_activa %}selected{% endif %}>{{ categoria.nombre }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <button class="interno-filtros__buscar ui-boton" type="submit">Buscar</button>
+    {% if hay_filtro %}
+      <a class="interno-filtros__limpiar ui-boton ui-boton--navegacion" href="{% url 'catalogo_interno' %}">Limpiar</a>
+    {% endif %}
+  </form>
+
+  {% if filas %}
+    <p class="interno__resumen">{{ total }} producto{{ total|pluralize }}</p>
+    <div class="interno">
+      <div class="interno__cabeza">
+        <span>Fotografía</span>
+        <span>Nombre</span>
+        <span>Categoría</span>
+        <span>Estado</span>
+        <span>Precio</span>
+        <span>Acción</span>
+      </div>
+      {% for fila in filas %}
+        <article class="interno__fila" id="producto-{{ fila.id }}">
+          <div class="interno__foto">
+            {% if fila.imagen %}
+              <img
+                src="{% static fila.imagen %}"
+                alt="{{ fila.imagen_alt }}"
+                width="{{ fila.imagen_ancho }}"
+                height="{{ fila.imagen_alto }}"
+                decoding="async"
+                loading="lazy"
+              >
+            {% else %}
+              <p>Fotografía pendiente</p>
+            {% endif %}
+          </div>
+          <h2 class="interno__nombre">{{ fila.nombre }}</h2>
+          <p class="interno__categoria"><span class="interno__etiqueta">Categoría</span> {{ fila.categoria }}</p>
+          <p class="interno__estado {% if fila.activo %}interno__estado--activo{% else %}interno__estado--inactivo{% endif %}">{{ fila.estado }}</p>
+          <p class="interno__precio {% if fila.precio_pendiente %}interno__precio--pendiente{% endif %}">
+            <span class="interno__etiqueta">Precio</span> {{ fila.precio_texto }}
+          </p>
+          <a class="interno__editar ui-boton ui-boton--editar" href="{% url 'catalogo_editar' fila.id %}">Editar</a>
+        </article>
+      {% endfor %}
+    </div>
+  {% elif hay_filtro %}
+    <p class="interno__vacio">Ningún producto coincide con la búsqueda.</p>
+  {% else %}
+    <p class="interno__vacio">Todavía no hay productos en el catálogo.</p>
+  {% endif %}
+{% endblock %}

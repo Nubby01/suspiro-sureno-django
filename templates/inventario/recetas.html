@@ -1,0 +1,39 @@
+{% extends "panel/indice.html" %}
+
+{% block panel_cuerpo %}
+  <p class="interno__acciones">
+    <a class="ui-boton ui-boton--navegacion" href="{% url 'inventario_gestion' %}">Volver al inventario</a>
+    <a class="ui-boton ui-boton--guardar" href="{% url 'inventario_receta_nueva' %}">Agregar ingrediente</a>
+  </p>
+  <ul class="cuenta-lista">
+    {% for producto in productos %}
+      <li>
+        <strong>{{ producto.nombre }}</strong>
+        {% if producto.slug == slug_rollitos %}
+          <span>Pendiente de resolución. La caja no usa una receta única y no se configuran ingredientes aquí.</span>
+        {% elif not producto.recetas.all %}
+          <span>Pendiente de configuración.</span>
+        {% else %}
+          {% for receta in producto.recetas.all %}
+            <span>
+              {% if receta.variante %}Variante {{ receta.variante.nombre|default:"inicial" }}{% else %}Producto{% endif %}.
+              Rinde {{ receta.rendimiento }}.
+              {% if "ejemplo:" in receta.alcance %}Ejemplo de prueba. No es la receta del taller y no se usa en pedidos reales.{% endif %}
+            </span>
+            {% for ingrediente in receta.ingredientes.all %}
+              <span>{{ ingrediente.insumo.nombre }}: {{ ingrediente.cantidad }} {{ ingrediente.insumo.get_unidad_display }}</span>
+              <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="accion" value="quitar">
+                <input type="hidden" name="ingrediente" value="{{ ingrediente.pk }}">
+                <button class="panel-enviar ui-boton" type="submit">Quitar {{ ingrediente.insumo.nombre }}</button>
+              </form>
+            {% empty %}
+              <span>Pendiente de configuración.</span>
+            {% endfor %}
+          {% endfor %}
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+{% endblock %}

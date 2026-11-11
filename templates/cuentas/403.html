@@ -1,0 +1,12 @@
+{% extends "cuentas/_pagina.html" %}
+
+{% block titulo %}Acceso no permitido · Suspiro Sureño{% endblock %}
+
+{% block cuenta %}
+  <header class="cuenta-intro cuenta-vacia">
+    <p class="kicker">Cuenta</p>
+    <h1>No tienes permiso para entrar aquí</h1>
+    <p>Tu sesión no puede abrir esta página.</p>
+    <p class="cuenta-alternativa"><a class="cuenta-volver" href="{% url 'inicio' %}">Volver al inicio</a></p>
+  </header>
+{% endblock %}

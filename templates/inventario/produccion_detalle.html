@@ -1,0 +1,84 @@
+{% extends "panel/indice.html" %}
+
+{% block panel_cuerpo %}
+  <p class="interno__acciones">
+    <a class="ui-boton ui-boton--navegacion" href="{% url ruta_lista %}">Volver a producción</a>
+    {% if es_administradora %}
+      <a class="ui-boton ui-boton--navegacion" href="{% url 'pedido_gestion' pedido.codigo %}">Ver el pedido</a>
+    {% endif %}
+  </p>
+  <dl class="ficha">
+    <div><dt>Estado</dt><dd><span class="estado estado--{{ pedido.estado }}">{{ pedido.get_estado_display }}</span></dd></div>
+    <div><dt>Fecha</dt><dd>{{ pedido.creada|date:"d-m-Y H:i" }}</dd></div>
+    <div><dt>Cliente</dt><dd>{{ pedido.nombre }}</dd></div>
+    {% if consumo %}
+      <div><dt>Existencias</dt><dd>Descontadas el {{ consumo.creada|date:"d-m-Y H:i" }}. No se vuelven a descontar.</dd></div>
+    {% else %}
+      <div><dt>Existencias</dt><dd>Todavía no hay descuento. Si falta receta o stock, el avance se detiene.</dd></div>
+    {% endif %}
+  </dl>
+  <p>Responsable: {% if pedido.responsable %}{{ pedido.responsable.get_full_name|default:pedido.responsable.username }}{% else %}Sin asignar{% endif %}</p>
+  {% if es_administradora %}
+    <form class="panel-form formulario-amplio" method="post">
+      {% csrf_token %}
+      <input type="hidden" name="accion" value="asignar">
+      <label for="id_responsable">Asignar trabajo</label>
+      <select class="entrada" id="id_responsable" name="responsable">
+        <option value="">Sin asignar</option>
+        {% for ayudante in ayudantes %}<option value="{{ ayudante.pk }}" {% if pedido.responsable_id == ayudante.pk %}selected{% endif %}>{{ ayudante.get_full_name|default:ayudante.username }}</option>{% endfor %}
+      </select>
+      <button class="panel-enviar ui-boton ui-boton--guardar" type="submit">Guardar asignación</button>
+    </form>
+  {% endif %}
+  <h2>Productos</h2>
+  <div class="tabla-marco">
+    <table class="tabla-panel">
+      <thead>
+        <tr>
+          <th>Producto</th>
+          <th>Detalle</th>
+          <th>Cantidad</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for linea in pedido.lineas.all %}
+          <tr>
+            <td data-etiqueta="Producto">{{ linea.nombre_producto }}</td>
+            <td data-etiqueta="Detalle">{{ linea.detalle|default:"—" }}</td>
+            <td data-etiqueta="Cantidad">{{ linea.cantidad }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <h2>Historial</h2>
+  <ol class="linea-tiempo">
+    {% for evento in pedido.eventos.all %}
+      <li>
+        <span>{{ evento.creada|date:"d-m-Y H:i" }}</span>
+        <strong>{{ evento.etiqueta_estado }}</strong>
+        {% if evento.usuario %}<span>por {{ evento.usuario.get_username }}</span>{% endif %}
+        {% if evento.nota %}<p>{{ evento.nota }}</p>{% endif %}
+      </li>
+    {% endfor %}
+  </ol>
+  {% if opciones %}
+    <h2>Registrar avance</h2>
+    <form class="panel-form formulario-amplio" method="post">
+      {% csrf_token %}
+      <div class="campo">
+        <label for="id_estado_produccion">Avance</label>
+        <select class="entrada" id="id_estado_produccion" name="estado">
+          {% for valor, etiqueta in opciones %}
+            <option value="{{ valor }}">{{ etiqueta }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="campo">
+        <label for="id_nota_produccion">Nota</label>
+        <textarea class="entrada" id="id_nota_produccion" name="nota" rows="3" maxlength="500"></textarea>
+      </div>
+      <button class="panel-enviar ui-boton ui-boton--guardar" type="submit">Registrar avance</button>
+    </form>
+  {% endif %}
+{% endblock %}

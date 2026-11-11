@@ -1,0 +1,66 @@
+{% extends "panel/indice.html" %}
+{% load interfaz %}
+
+{% block panel_cuerpo %}
+  <p class="interno__acciones">
+    <a class="ui-boton ui-boton--navegacion" href="{% url 'catalogo_editar' producto.id %}">Volver al producto</a>
+    <a class="ui-boton ui-boton--navegacion" href="{% url 'catalogo_galeria' producto.id %}">Galería</a>
+  </p>
+
+  <form class="panel-form formulario-amplio panel-form--ancho" method="post" novalidate>
+    {% csrf_token %}
+    {{ formset.management_form }}
+    {% if formset.non_form_errors %}
+      <div class="mensaje-error" role="alert">{{ formset.non_form_errors }}</div>
+    {% endif %}
+    {% for variante in formset %}
+      <fieldset class="variante-editor">
+        <legend>Variante {{ forloop.counter }}</legend>
+        {% if variante.non_field_errors or variante.id.errors %}
+          <div class="mensaje-error" role="alert">{{ variante.non_field_errors }}{{ variante.id.errors }}</div>
+        {% endif %}
+        {{ variante.id }}
+        {% for campo in variante %}
+          {% if campo.name != "id" %}
+            <div class="campo {% if campo.widget_type == 'checkbox' %}campo--casilla{% endif %}">
+              <label for="{{ campo.id_for_label }}">{{ campo.label }}</label>
+              {{ campo|campo_ui }}
+              {% if campo.help_text %}<p class="ayuda">{{ campo.help_text }}</p>{% endif %}
+              {% if campo.errors %}
+                <ul class="errorlist" role="alert">
+                  {% for error in campo.errors %}<li>{{ error }}</li>{% endfor %}
+                </ul>
+              {% endif %}
+            </div>
+          {% endif %}
+        {% endfor %}
+      </fieldset>
+    {% empty %}
+      <p>Este producto todavía no tiene variantes.</p>
+    {% endfor %}
+    {% if formset.forms %}
+      <button class="panel-enviar ui-boton ui-boton--guardar" type="submit" name="accion" value="guardar">Guardar variantes</button>
+    {% endif %}
+  </form>
+
+  <form class="panel-form formulario-amplio" method="post" novalidate>
+    {% csrf_token %}
+    <h2>Agregar variante</h2>
+    {% if nueva.non_field_errors %}
+      <div class="mensaje-error" role="alert">{{ nueva.non_field_errors }}</div>
+    {% endif %}
+    {% for campo in nueva %}
+      <div class="campo {% if campo.widget_type == 'checkbox' %}campo--casilla{% endif %}">
+        <label for="{{ campo.id_for_label }}">{{ campo.label }}</label>
+        {{ campo|campo_ui }}
+        {% if campo.help_text %}<p class="ayuda">{{ campo.help_text }}</p>{% endif %}
+        {% if campo.errors %}
+          <ul class="errorlist" role="alert">
+            {% for error in campo.errors %}<li>{{ error }}</li>{% endfor %}
+          </ul>
+        {% endif %}
+      </div>
+    {% endfor %}
+    <button class="panel-enviar ui-boton ui-boton--guardar" type="submit" name="accion" value="agregar">Agregar variante</button>
+  </form>
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block estilos_extra %}
+  <link rel="stylesheet" href="{% static 'css/cuenta.css' %}?v=b13-final">
+{% endblock %}
+
+{% block cuerpo %}
+  {% include "core/_cabecera.html" %}
+  <main id="contenido" class="cuenta-pagina {% block clase_pagina %}{% endblock %}">
+    <div class="ancho">
+      {% block cuenta %}{% endblock %}
+    </div>
+  </main>
+  {% include "core/_pie.html" %}
+{% endblock %}

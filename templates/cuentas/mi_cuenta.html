@@ -1,0 +1,76 @@
+{% extends "cuentas/_pagina.html" %}
+{% load interfaz %}
+
+{% block titulo %}Mi cuenta · Suspiro Sureño{% endblock %}
+{% block clase_pagina %}cuenta-pagina--cuenta{% endblock %}
+
+{% block cuenta %}
+  <header class="cuenta-intro">
+    <p class="kicker">Cuenta</p>
+    <h1>Mi cuenta</h1>
+    <p>Revisa tus datos y mantén tu cuenta al día.</p>
+  </header>
+
+  <nav class="cuenta-atajos" aria-label="Accesos de mi cuenta">
+    {% if cuenta.rol == "cliente" %}
+      <a class="ui-boton ui-boton--secundario" href="{% url 'mis_cotizaciones' %}">Mis cotizaciones</a>
+      <a class="ui-boton ui-boton--contorno" href="{% url 'mis_pedidos' %}">Mis pedidos</a>
+    {% elif destino_cuenta %}
+      <a class="ui-boton ui-boton--secundario" href="{{ destino_cuenta }}">{{ etiqueta_cuenta }}</a>
+    {% endif %}
+    <a class="ui-boton ui-boton--contorno" href="{% url 'catalogo' %}">Explorar catálogo</a>
+  </nav>
+  <div class="cuenta-columnas">
+  <section class="cuenta-seccion" aria-labelledby="titulo-datos">
+    <h2 id="titulo-datos">Datos personales</h2>
+    <ul class="cuenta-lista">
+      <li><span>Rol</span> {{ cuenta.get_rol_display }}</li>
+      <li><span>Registro</span> {{ cuenta.date_joined|date:"d-m-Y" }}</li>
+    </ul>
+    <form class="cuenta-tarjeta" method="post" novalidate>
+      {% csrf_token %}
+      <input type="hidden" name="accion" value="datos">
+      {% if form_datos.non_field_errors %}
+        <div class="mensaje-error" role="alert">{{ form_datos.non_field_errors }}</div>
+      {% endif %}
+      {% for campo in form_datos %}
+        <div class="campo{% if campo.widget_type == 'textarea' %} campo--ancho{% endif %}">
+          <label for="{{ campo.id_for_label }}">{{ campo.label }}</label>
+          {{ campo|campo_ui }}
+          {% if campo.errors %}
+            <ul class="errorlist" role="alert">
+              {% for error in campo.errors %}<li>{{ error }}</li>{% endfor %}
+            </ul>
+          {% endif %}
+        </div>
+      {% endfor %}
+      <button class="boton-cuenta ui-boton" type="submit">Guardar datos</button>
+    </form>
+  </section>
+
+  <section class="cuenta-seccion" aria-labelledby="titulo-seguridad">
+    <h2 id="titulo-seguridad">Seguridad</h2>
+    <form class="cuenta-tarjeta" method="post" novalidate>
+      {% csrf_token %}
+      <input type="hidden" name="accion" value="clave">
+      {% if form_clave.non_field_errors %}
+        <div class="mensaje-error" role="alert">{{ form_clave.non_field_errors }}</div>
+      {% endif %}
+      {% for campo in form_clave %}
+        <div class="campo{% if campo.widget_type == 'textarea' %} campo--ancho{% endif %}">
+          <label for="{{ campo.id_for_label }}">{{ campo.label }}</label>
+          {{ campo|campo_ui }}
+          {% if campo.help_text %}<p class="ayuda">{{ campo.help_text }}</p>{% endif %}
+          {% if campo.errors %}
+            <ul class="errorlist" role="alert">
+              {% for error in campo.errors %}<li>{{ error }}</li>{% endfor %}
+            </ul>
+          {% endif %}
+        </div>
+      {% endfor %}
+      <button class="boton-cuenta ui-boton" type="submit">Cambiar contraseña</button>
+    </form>
+  </section>
+  </div>
+
+{% endblock %}

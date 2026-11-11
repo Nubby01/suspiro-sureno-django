@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block titulo %}Catálogo · Suspiro Sureño{% endblock %}
+{% block descripcion %}Catálogo de dulces y repostería artesanal de Suspiro Sureño.{% endblock %}
+{% block estilos_extra %}
+  <link rel="stylesheet" href="{% static 'css/catalogo.css' %}?v=b13-final">
+{% endblock %}
+
+{% block cuerpo %}
+  {% include "core/_cabecera.html" %}
+
+  <main id="contenido" class="catalogo-pagina">
+    <div class="ancho">
+      <header class="catalogo-intro" id="catalogo-inicio">
+        <p class="kicker">Catálogo</p>
+        <h1>Nuestras delicias</h1>
+        <p>Descubre nuestros dulces artesanales, preparados con cariño para cada ocasión. Explora nuestros sabores y encuentra tu favorito.</p>
+      </header>
+
+      {% if hay_productos %}
+        <div class="catalogo-barra">
+          <div class="catalogo-barra__fila">
+            <div class="catalogo-buscar">
+              <label>
+                <span class="oculto-visual">Buscar productos</span>
+                <svg class="catalogo-buscar__lupa" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="1.8"></circle>
+                  <path d="M16 16.5L20 20.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path>
+                </svg>
+                <input type="search" data-buscar-productos placeholder="¿Qué dulce estás buscando?" autocomplete="off" enterkeyhint="search">
+              </label>
+              <button type="button" class="catalogo-buscar__limpiar" data-limpiar-busqueda hidden>
+                <span class="oculto-visual">Limpiar búsqueda</span>
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path>
+                </svg>
+              </button>
+            </div>
+            <button type="button" class="catalogo-categorias" data-categorias-toggle aria-expanded="false" aria-controls="catalogo-categorias" aria-label="Categorías. Todas las categorías">
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M4 7h16M7 12h10M10 17h4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path>
+              </svg>
+              <span>Categorías</span>
+            </button>
+          </div>
+          <nav id="catalogo-categorias" class="catalogo-nav" aria-label="Categorías">
+            <a href="#catalogo-inicio" data-catalogo-todos aria-current="location">
+              <span class="catalogo-nav__corto">Todos</span>
+              <span class="catalogo-nav__largo">Todas las categorías</span>
+            </a>
+            {% for grupo in grupos %}
+              <a href="#{{ grupo.id }}">{{ grupo.nombre }}</a>
+            {% endfor %}
+          </nav>
+        </div>
+        <p class="catalogo-sin-resultado" data-sin-resultado hidden>No hay productos que coincidan con la búsqueda.</p>
+        {% for grupo in grupos %}
+          <section class="catalogo-grupo" id="{{ grupo.id }}" aria-labelledby="titulo-{{ grupo.id }}">
+            <header class="catalogo-grupo__intro">
+              <h2 id="titulo-{{ grupo.id }}">{{ grupo.nombre }}</h2>
+              {% if grupo.descripcion %}
+                <p>{{ grupo.descripcion }}</p>
+              {% endif %}
+            </header>
+            <div class="catalogo-grilla">
+              {% for producto in grupo.productos %}
+                {% include "catalogo/_producto.html" %}
+              {% endfor %}
+            </div>
+          </section>
+        {% endfor %}
+      {% else %}
+        <div class="catalogo-vacio">
+          <h2>Todavía no hay productos publicados</h2>
+          <p>Cuando una preparación esté disponible, aparecerá aquí con su precio.</p>
+          <a class="catalogo-volver ui-boton" href="{% url 'inicio' %}">Volver al inicio</a>
+        </div>
+      {% endif %}
+    </div>
+  </main>
+
+  {% include "core/_pie.html" %}
+{% endblock %}
+
+{% block scripts %}
+  <script src="{% static 'js/catalogo.js' %}?v=b13-final"></script>
+{% endblock %}

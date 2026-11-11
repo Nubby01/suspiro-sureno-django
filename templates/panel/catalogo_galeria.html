@@ -1,0 +1,68 @@
+{% extends "panel/indice.html" %}
+{% load interfaz %}
+{% load static %}
+
+{% block panel_cuerpo %}
+  <p class="interno__acciones">
+    <a class="ui-boton ui-boton--navegacion" href="{% url 'catalogo_editar' producto.id %}">Volver al producto</a>
+    <a class="ui-boton ui-boton--navegacion" href="{% url 'catalogo_variantes' producto.id %}">Variantes y precios</a>
+  </p>
+
+  {% if sabores %}
+    <form class="panel-form formulario-amplio panel-form--ancho" method="post">
+      {% csrf_token %}
+      <ul class="galeria-editor">
+        {% for sabor in sabores %}
+          <li>
+            {% if sabor.imagen %}
+              <img
+                src="{% static sabor.imagen %}"
+                alt="{{ sabor.imagen_alt }}"
+                width="{{ sabor.imagen_ancho }}"
+                height="{{ sabor.imagen_alto }}"
+              >
+            {% else %}
+              <p>Fotografía pendiente</p>
+            {% endif %}
+            <p>{{ sabor.nombre }}</p>
+            <div class="campo{% if campo.widget_type == 'textarea' %} campo--ancho{% endif %}">
+              <label for="orden-{{ sabor.id }}">Orden</label>
+              <input class="entrada" id="orden-{{ sabor.id }}" name="orden-{{ sabor.id }}" type="number" min="0" inputmode="numeric" value="{{ sabor.orden }}" required>
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
+      <button class="panel-enviar ui-boton ui-boton--guardar" type="submit" name="accion" value="ordenar">Guardar orden</button>
+    </form>
+    {% for sabor in sabores %}
+      <form class="galeria-quitar" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="elemento" value="{{ sabor.id }}">
+        <button class="ui-boton ui-boton--aviso" type="submit" name="accion" value="quitar">Quitar {{ sabor.nombre }} de la galería</button>
+      </form>
+    {% endfor %}
+  {% else %}
+    <p>Este producto todavía no tiene sabores en la galería.</p>
+  {% endif %}
+
+  <form class="panel-form formulario-amplio" method="post" novalidate>
+    {% csrf_token %}
+    <h2>Agregar sabor</h2>
+    {% if formulario.non_field_errors %}
+      <div class="mensaje-error" role="alert">{{ formulario.non_field_errors }}</div>
+    {% endif %}
+    {% for campo in formulario %}
+      <div class="campo{% if campo.widget_type == 'textarea' %} campo--ancho{% endif %}">
+        <label for="{{ campo.id_for_label }}">{{ campo.label }}</label>
+        {{ campo|campo_ui }}
+        {% if campo.help_text %}<p class="ayuda">{{ campo.help_text }}</p>{% endif %}
+        {% if campo.errors %}
+          <ul class="errorlist" role="alert">
+            {% for error in campo.errors %}<li>{{ error }}</li>{% endfor %}
+          </ul>
+        {% endif %}
+      </div>
+    {% endfor %}
+    <button class="panel-enviar ui-boton ui-boton--guardar" type="submit" name="accion" value="agregar">Agregar a la galería</button>
+  </form>
+{% endblock %}

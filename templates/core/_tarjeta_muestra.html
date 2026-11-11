@@ -1,0 +1,10 @@
+<article class="tarjeta-muestra">
+  {% include "core/_marco.html" with clave=item.clave foto_pendiente=item.foto_pendiente alt=item.titulo extra="marco--muestra" %}
+  <div class="tarjeta-muestra__texto">
+    {% if item.es_muestra %}
+      <p class="tarjeta-muestra__estado">No está a la venta</p>
+    {% endif %}
+    <h3>{{ item.titulo }}</h3>
+    <p>{{ item.descripcion }}</p>
+  </div>
+</article>

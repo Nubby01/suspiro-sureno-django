@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block titulo %}{{ producto.nombre }} · Suspiro Sureño{% endblock %}
+{% block descripcion %}{{ producto.nombre }}. El precio se consulta.{% endblock %}
+{% block estilos_extra %}
+  <link rel="stylesheet" href="{% static 'css/catalogo.css' %}?v=b13-final">
+{% endblock %}
+
+{% block cuerpo %}
+  {% include "core/_cabecera.html" %}
+
+  <main id="contenido" class="catalogo-pagina">
+    <div class="ancho">
+      <header class="catalogo-intro">
+        <p class="kicker">{{ producto.categoria }}</p>
+        <h1>{{ producto.nombre }}</h1>
+        {% if producto.inicial.precio_pendiente %}
+          <p>El precio de este producto está pendiente de consulta.</p>
+        {% endif %}
+      </header>
+
+      <article class="detalle">
+        {% if producto.imagen %}
+          <img
+            class="detalle__portada"
+            src="{% static producto.imagen %}"
+            alt="{{ producto.imagen_alt }}"
+            width="{{ producto.imagen_ancho }}"
+            height="{{ producto.imagen_alto }}"
+            decoding="async"
+          >
+        {% else %}
+          <p class="detalle__pendiente">Fotografía pendiente</p>
+        {% endif %}
+        <p class="detalle__precio">{{ producto.inicial.precio_texto }}</p>
+        {% include "catalogo/_cotizar.html" %}
+      </article>
+
+      {% if sabores %}
+        <section class="sabores" data-sabores aria-label="Sabores de {{ producto.nombre }}">
+          <h2>Sabores</h2>
+          <div class="sabores__marco">
+            <button type="button" class="sabores__control sabores__anterior ui-boton ui-boton--contorno" data-sabor-anterior aria-label="Sabor anterior">
+              Anterior
+            </button>
+            <div class="sabores__pista" data-sabor-pista tabindex="0">
+              {% for sabor in sabores %}
+                <figure class="sabores__item" data-sabor>
+                  {% if sabor.imagen %}
+                    <img
+                      src="{% static sabor.imagen %}"
+                      alt="{{ sabor.imagen_alt }}"
+                      width="{{ sabor.imagen_ancho }}"
+                      height="{{ sabor.imagen_alto }}"
+                      decoding="async"
+                    >
+                  {% else %}
+                    <p>Fotografía pendiente</p>
+                  {% endif %}
+                  <figcaption>{{ sabor.nombre }}</figcaption>
+                </figure>
+              {% endfor %}
+            </div>
+            <button type="button" class="sabores__control sabores__siguiente ui-boton ui-boton--contorno" data-sabor-siguiente aria-label="Sabor siguiente">
+              Siguiente
+            </button>
+          </div>
+          <p class="sabores__indice" data-sabor-indice aria-live="polite">{{ sabores|length }} sabores</p>
+        </section>
+      {% endif %}
+
+      <a class="catalogo-volver ui-boton" href="{% url 'catalogo' %}#categoria-{{ producto.categoria_slug }}">Volver al catálogo</a>
+    </div>
+  </main>
+
+  {% include "core/_pie.html" %}
+{% endblock %}
+
+{% block scripts %}
+  <script src="{% static 'js/catalogo.js' %}?v=b13-final"></script>
+  {% if sabores %}
+    <script src="{% static 'js/sabores.js' %}"></script>
+  {% endif %}
+{% endblock %}

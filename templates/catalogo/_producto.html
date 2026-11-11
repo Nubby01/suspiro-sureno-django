@@ -1,0 +1,67 @@
+{% load static %}
+<article class="producto" data-producto="{{ producto.id }}" data-busqueda="{{ producto.busqueda }}">
+  {% if producto.imagen %}
+    <div class="producto__marco">
+      <img
+        class="producto__foto"
+        src="{% static producto.imagen %}"
+        alt="{{ producto.imagen_alt }}"
+        width="{{ producto.imagen_ancho }}"
+        height="{{ producto.imagen_alto }}"
+        decoding="async"
+        {% if producto.imagen_diferida %}loading="lazy"{% else %}loading="eager"{% endif %}
+      >
+    </div>
+  {% else %}
+    <div class="producto__marco" role="img" aria-label="Fotografía pendiente de {{ producto.nombre }}">
+      <svg class="producto__dibujo" viewBox="0 0 160 200" aria-hidden="true">
+        <path d="M34 146c18-42 38-66 50-66s20 16 20 32-14 26-28 34-36 16-36 34 13 22 30 22 38-18 58-58" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="116" cy="52" r="5" fill="currentColor"/>
+      </svg>
+      <span class="producto__marco-estado">Fotografía pendiente</span>
+    </div>
+  {% endif %}
+  <div class="producto__cuerpo">
+    <h3>
+      {% if producto.detalle %}
+        <a href="{{ producto.detalle }}">{{ producto.nombre }}</a>
+      {% else %}
+        {{ producto.nombre }}
+      {% endif %}
+    </h3>
+    {% if producto.variante_unica %}
+      <p class="producto__variante">{{ producto.variante_unica }}</p>
+    {% endif %}
+    {% if producto.descripcion %}
+      <p class="producto__descripcion">{{ producto.descripcion }}</p>
+    {% endif %}
+    <p class="producto__precio">
+      <span class="oculto-visual">Precio</span>
+      <span data-precio-visible aria-live="polite"{% if producto.inicial.precio_pendiente %} class="producto__precio-valor--consultar"{% endif %}>{{ producto.inicial.precio_texto }}</span>
+    </p>
+    {% if producto.galeria %}
+      <button type="button" class="producto__detalle ui-boton" data-abrir-selector="sabores-{{ producto.id }}">Ver sabores</button>
+      <dialog class="selector selector--sabores" id="sabores-{{ producto.id }}" aria-labelledby="sabores-titulo-{{ producto.id }}" aria-modal="true">
+        <div class="selector__cuerpo">
+          <div class="selector__identidad">
+            <h2 id="sabores-titulo-{{ producto.id }}">Sabores disponibles</h2>
+            <button type="button" class="selector__cerrar ui-boton ui-boton--contorno" data-cerrar-selector>Cerrar</button>
+          </div>
+          <ul class="sabores-modal">
+            {% for sabor in producto.galeria %}
+              <li>
+                {% if sabor.imagen %}
+                  <img src="{% static sabor.imagen %}" alt="{{ sabor.imagen_alt }}" width="{{ sabor.imagen_ancho }}" height="{{ sabor.imagen_alto }}" decoding="async">
+                {% else %}
+                  <p>Fotografía pendiente</p>
+                {% endif %}
+                <span>{{ sabor.nombre }}</span>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </dialog>
+    {% endif %}
+    {% include "catalogo/_cotizar.html" %}
+  </div>
+</article>

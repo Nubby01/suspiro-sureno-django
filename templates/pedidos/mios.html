@@ -1,0 +1,40 @@
+{% extends "cuentas/_pagina.html" %}
+
+{% block titulo %}Mis pedidos · Suspiro Sureño{% endblock %}
+
+{% block cuenta %}
+  <header class="cuenta-intro">
+    <p class="kicker">Cuenta</p>
+    <h1>Mis pedidos</h1>
+    <p>Solo se muestran los pedidos asociados a esta cuenta.</p>
+  </header>
+  {% if pedidos %}
+    <div class="tabla-marco">
+      <table class="tabla-panel">
+        <thead>
+          <tr>
+            <th>Código</th>
+            <th>Estado</th>
+            <th>Total</th>
+            <th>Cotización</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for pedido in pedidos %}
+            <tr>
+              <td data-etiqueta="Código">{{ pedido.codigo }}</td>
+              <td data-etiqueta="Estado"><span class="estado estado--{{ pedido.estado }}">{{ pedido.get_estado_display }}</span></td>
+              <td data-etiqueta="Total">{{ pedido.total_texto }}</td>
+              <td data-etiqueta="Cotización">{{ pedido.cotizacion.codigo }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p>Todavía no tienes pedidos.</p>
+  {% endif %}
+  <p><a class="panel-enviar ui-boton" href="{% url 'catalogo' %}">Explorar el catálogo</a></p>
+  <p><a class="cuenta-volver" href="{% url 'mi_cuenta' %}">Volver a mi cuenta</a></p>
+  <p><a class="cuenta-volver" href="{% url 'mis_cotizaciones' %}">Ver mis cotizaciones</a></p>
+{% endblock %}

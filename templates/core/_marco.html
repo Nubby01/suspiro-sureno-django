@@ -1,0 +1,13 @@
+<div class="marco marco--{{ clave }}{% if extra %} {{ extra }}{% endif %}">
+  {% if imagen %}
+    <img src="{{ imagen }}" alt="{{ alt }}">
+  {% else %}
+    <div class="marco__reserva" role="img" aria-label="Espacio reservado para fotografía. {{ foto_pendiente }}">
+      <svg class="marco__dibujo" viewBox="0 0 160 200" aria-hidden="true">
+        <path d="M34 146c18-42 38-66 50-66s20 16 20 32-14 26-28 34-36 16-36 34 13 22 30 22 38-18 58-58" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="116" cy="52" r="5" fill="currentColor"/>
+      </svg>
+      <span class="marco__estado">Fotografía pendiente</span>
+    </div>
+  {% endif %}
+</div>

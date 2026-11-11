@@ -1,0 +1,117 @@
+{% load static %}
+<button type="button" class="producto__elegir ui-boton" data-abrir-selector="selector-{{ producto.id }}">
+  Elegir
+</button>
+<dialog class="selector" id="selector-{{ producto.id }}" aria-labelledby="selector-titulo-{{ producto.id }}" aria-modal="true">
+  <form class="producto__cotizar selector__cuerpo" method="post" action="{% url 'cotizacion_agregar' %}" data-selector>
+    {% csrf_token %}
+    <div class="selector__cabeza">
+      {% if producto.imagen %}
+        <img
+          class="selector__foto"
+          src="{% static producto.imagen %}"
+          alt="{{ producto.imagen_alt }}"
+          width="{{ producto.imagen_ancho }}"
+          height="{{ producto.imagen_alto }}"
+          decoding="async"
+        >
+      {% else %}
+        <p class="selector__pendiente">Fotografía pendiente</p>
+      {% endif %}
+      <div class="selector__identidad">
+        <h2 id="selector-titulo-{{ producto.id }}">{{ producto.nombre }}</h2>
+        <button type="button" class="selector__cerrar ui-boton ui-boton--contorno" data-cerrar-selector>Cerrar</button>
+      </div>
+    </div>
+    {% if producto.descripcion %}
+      <p class="selector__descripcion">{{ producto.descripcion }}</p>
+    {% endif %}
+    <input type="hidden" name="origen" value="{{ request.path }}">
+    {% if producto.selector %}
+      <fieldset class="variantes{% if producto.personas %} variantes--personas{% endif %}">
+        <legend>{% if producto.personas %}Cantidad de personas{% else %}Presentación{% endif %}</legend>
+        <div class="variantes__lista">
+          {% for variante in producto.variantes %}
+            <label>
+              <input type="radio" name="variante" value="{{ variante.id }}" {% if variante.precio_pendiente %}data-precio-pendiente="1"{% else %}data-precio="{{ variante.precio }}"{% endif %}{% if variante.id == producto.inicial.id %} checked{% endif %}>
+              <span class="variante-opcion"><span>{{ variante.etiqueta }}</span><strong>{{ variante.precio_texto }}</strong></span>
+            </label>
+          {% endfor %}
+        </div>
+      </fieldset>
+    {% else %}
+      <input type="hidden" name="variante" value="{{ producto.inicial.id }}" {% if producto.inicial.precio_pendiente %}data-pendiente="1"{% else %}data-precio="{{ producto.inicial.precio }}"{% endif %}>
+      {% if producto.variante_unica %}
+        <p>Presentación: {{ producto.variante_unica }}</p>
+      {% endif %}
+      {% if producto.nota_caja %}
+        <p class="producto__cotizar-nota">{{ producto.nota_caja }}</p>
+      {% endif %}
+    {% endif %}
+    <label class="producto__cotizar-campo">
+      <span>{% if producto.sabores_caja or producto.sabores_berlines or producto.nota_caja %}Cantidad de cajas{% else %}Cantidad de presentaciones{% endif %}</span>
+      <input type="number" name="cantidad" value="1" min="1" max="99" inputmode="numeric" required>
+    </label>
+    {% if producto.sabores_brownie %}
+      <div class="producto__cotizar-campo">
+        <label for="opcion-sabor_brownie-{{ producto.id }}">Centro</label>
+        <select id="opcion-sabor_brownie-{{ producto.id }}" data-selector-calido name="sabor_brownie" required>
+          <option value="">Elige un centro</option>
+          {% for sabor in producto.sabores_brownie %}
+            <option value="{{ sabor.codigo }}">{{ sabor.nombre }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    {% endif %}
+    {% if producto.sabores_berlines %}
+      <p class="producto__cotizar-nota">Caja de 4. Puedes indicar uno o dos sabores.</p>
+      <div class="producto__cotizar-campo">
+        <label for="opcion-sabor_1-{{ producto.id }}">Primer sabor</label>
+        <select id="opcion-sabor_1-{{ producto.id }}" data-selector-calido name="sabor_1" required>
+          <option value="">Elige un sabor</option>
+          {% for sabor in producto.sabores_berlines %}
+            <option value="{{ sabor.codigo }}">{{ sabor.nombre }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="producto__cotizar-campo">
+        <label for="opcion-sabor_2-{{ producto.id }}">Segundo sabor</label>
+        <select id="opcion-sabor_2-{{ producto.id }}" data-selector-calido name="sabor_2">
+          <option value="">Sin segundo sabor</option>
+          {% for sabor in producto.sabores_berlines %}
+            <option value="{{ sabor.codigo }}">{{ sabor.nombre }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    {% endif %}
+    {% if producto.sabores_caja %}
+      <p class="producto__cotizar-nota">Caja de 4. Puedes indicar uno o dos sabores dulces.</p>
+      <div class="producto__cotizar-campo">
+        <label for="opcion-sabor_1-{{ producto.id }}">Primer sabor</label>
+        <select id="opcion-sabor_1-{{ producto.id }}" data-selector-calido name="sabor_1" required>
+          {% for sabor in producto.sabores_caja %}
+            <option value="{{ sabor.slug }}">{{ sabor.nombre }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="producto__cotizar-campo">
+        <label for="opcion-sabor_2-{{ producto.id }}">Segundo sabor</label>
+        <select id="opcion-sabor_2-{{ producto.id }}" data-selector-calido name="sabor_2">
+          <option value="">Sin segundo sabor</option>
+          {% for sabor in producto.sabores_caja %}
+            <option value="{{ sabor.slug }}">{{ sabor.nombre }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    {% endif %}
+    <p class="selector__cuenta">
+      <span>Precio</span>
+      <strong data-monto-modal{% if producto.inicial.precio_pendiente %} class="producto__precio-valor--consultar"{% endif %}>{{ producto.inicial.precio_texto }}</strong>
+    </p>
+    <p class="selector__cuenta">
+      <span>Subtotal</span>
+      <strong data-subtotal>{% if producto.inicial.precio_pendiente %}Consultar precio{% else %}{{ producto.inicial.precio_texto }}{% endif %}</strong>
+    </p>
+    <button class="ui-boton" type="submit">Agregar a la cotización</button>
+  </form>
+</dialog>

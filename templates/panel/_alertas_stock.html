@@ -1,0 +1,4 @@
+          <h2>Alertas de inventario</h2>
+          {% for insumo in alertas_inventario %}
+          <a href="{% url 'inventario_ficha' insumo.pk %}"><strong>{{ insumo.nombre }}</strong><span>{% if insumo.existencia == 0 %}Sin stock{% else %}Stock crítico{% endif %} · {{ insumo.existencia }} {{ insumo.get_unidad_display }}</span></a>
+          {% empty %}<p>No hay insumos sin stock ni en nivel crítico.</p>{% endfor %}

@@ -1,0 +1,71 @@
+{% extends "panel/indice.html" %}
+
+{% block panel_cuerpo %}
+  <p class="interno__acciones">
+    <a class="ui-boton ui-boton--navegacion" href="{% url 'pedidos_gestion' %}">Volver al listado</a>
+    <a class="ui-boton ui-boton--navegacion" href="{% url 'cotizacion_gestion' pedido.cotizacion.codigo %}">Ver cotización</a>
+  </p>
+  <dl class="ficha">
+    <div><dt>Estado</dt><dd><span class="estado estado--{{ pedido.estado }}">{{ pedido.get_estado_display }}</span></dd></div>
+    <div><dt>Fecha</dt><dd>{{ pedido.creada|date:"d-m-Y H:i" }}</dd></div>
+    <div><dt>Contacto</dt><dd>{{ pedido.nombre }} · {{ pedido.correo }} · {{ pedido.telefono }}</dd></div>
+    <div><dt>Total confirmado</dt><dd>{{ pedido.total_texto }}</dd></div>
+    <div><dt>Cotización</dt><dd>{{ pedido.cotizacion.codigo }}</dd></div>
+  </dl>
+  <h2>Productos</h2>
+  <div class="tabla-marco">
+    <table class="tabla-panel">
+      <thead>
+        <tr>
+          <th>Producto</th>
+          <th>Detalle</th>
+          <th>Cantidad</th>
+          <th>Precio</th>
+          <th>Importe</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for linea in pedido.lineas.all %}
+          <tr>
+            <td data-etiqueta="Producto">{{ linea.nombre_producto }}</td>
+            <td data-etiqueta="Detalle">{{ linea.detalle|default:"—" }}</td>
+            <td data-etiqueta="Cantidad">{{ linea.cantidad }}</td>
+            <td data-etiqueta="Precio">{{ linea.precio_texto }}</td>
+            <td data-etiqueta="Importe">{{ linea.importe_texto }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <h2>Historial</h2>
+  <ol class="linea-tiempo">
+    {% for evento in pedido.eventos.all %}
+      <li>
+        <span>{{ evento.creada|date:"d-m-Y H:i" }}</span>
+        <strong>{{ evento.etiqueta_estado }}</strong>
+        {% if evento.usuario %}<span>por {{ evento.usuario.get_username }}</span>{% endif %}
+        {% if evento.nota %}<p>{{ evento.nota }}</p>{% endif %}
+      </li>
+    {% endfor %}
+  </ol>
+  {% if opciones %}
+    <h2>Registrar avance</h2>
+    <form class="panel-form formulario-amplio" method="post">
+      {% csrf_token %}
+      <div class="campo">
+        <label for="id_estado_pedido">Nuevo estado</label>
+        <select class="entrada" id="id_estado_pedido" name="estado">
+          {% for valor, etiqueta in opciones %}
+            <option value="{{ valor }}">{{ etiqueta }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="campo">
+        <label for="id_nota">Nota</label>
+        <textarea class="entrada" id="id_nota" name="nota" rows="3" maxlength="500"></textarea>
+        <p class="ayuda">Obligatoria si cancelas el pedido.</p>
+      </div>
+      <button class="panel-enviar ui-boton ui-boton--guardar" type="submit">Registrar cambio</button>
+    </form>
+  {% endif %}
+{% endblock %}

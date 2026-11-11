@@ -1,0 +1,33 @@
+<header class="cabecera">
+  <div class="ancho cabecera__barra">
+    {% include "core/_marca.html" %}
+    <button type="button" class="nav-toggle" data-nav-toggle aria-expanded="false" aria-controls="nav-principal">
+      <span class="nav-toggle__icono" aria-hidden="true"></span>
+      <span data-nav-texto>Menú</span>
+    </button>
+    <nav id="nav-principal" class="nav nav--cerrado" aria-label="Principal">
+      {% for enlace in enlaces_nav %}
+        {% if enlace.nombre == "cotizaciones" %}
+          <a class="cabecera-cotizacion" href="{{ enlace.url }}" aria-label="Ver cotización{% if contador_cotizacion %}: {{ contador_cotizacion }} presentaciones seleccionadas{% endif %}"{% if request.path == enlace.url %} aria-current="page"{% endif %}>Ver cotización{% if contador_cotizacion %} <span class="cotizacion-contador" aria-hidden="true">{{ contador_cotizacion }}</span>{% endif %}</a>
+        {% else %}
+          <a href="{{ enlace.url }}" {% if request.path == enlace.url %}aria-current="page"{% endif %}>{{ enlace.etiqueta }}</a>
+        {% endif %}
+      {% endfor %}
+      {% if user.is_authenticated %}
+        <a href="{% url 'mi_cuenta' %}" {% if request.resolver_match.url_name == "mi_cuenta" %}aria-current="page"{% endif %}>Mi cuenta</a>
+        {% if etiqueta_cuenta != "Mi cuenta" %}
+          <a href="{{ destino_cuenta }}" {% if request.path == destino_cuenta %}aria-current="page"{% endif %}>{{ etiqueta_cuenta }}</a>
+        {% endif %}
+        <form method="post" action="{% url 'salir' %}">
+          {% csrf_token %}
+          <button type="submit" class="nav-accion">Cerrar sesión</button>
+        </form>
+      {% else %}
+        <a class="nav-entrar" href="{% url 'ingresar' %}" {% if request.resolver_match.url_name == "ingresar" %}aria-current="page"{% endif %}>Iniciar sesión</a>
+        <a class="nav-crear" href="{% url 'registro' %}" {% if request.resolver_match.url_name == "registro" %}aria-current="page"{% endif %}>Crear cuenta</a>
+      {% endif %}
+    </nav>
+  </div>
+</header>
+
+{% include "core/_avisos.html" %}

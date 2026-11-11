@@ -1,0 +1,51 @@
+{% extends "panel/indice.html" %}
+
+{% block panel_cuerpo %}
+  <form class="interno-filtros" method="get" role="search">
+    {% if incluir_demo %}<input type="hidden" name="incluir_demo" value="1">{% endif %}
+    <div class="interno-filtros__campo">
+      <label for="id_q">Buscar por nombre</label>
+      <input id="id_q" type="search" name="q" value="{{ busqueda }}" maxlength="120">
+    </div>
+    <div class="interno-filtros__campo">
+      <label for="id_estado">Estado</label>
+      <select id="id_estado" name="estado">
+        <option value="">Todos</option>
+        {% for valor, etiqueta in estados %}
+          <option value="{{ valor }}" {% if valor == estado %}selected{% endif %}>{{ etiqueta }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <button class="interno-filtros__buscar ui-boton" type="submit">Buscar</button>
+  </form>
+  {% if cotizaciones %}
+    <div class="tabla-marco">
+      <table class="tabla-panel">
+        <thead>
+          <tr>
+            <th>Código</th>
+            <th>Cliente</th>
+            <th>Fecha</th>
+            <th>Estado</th>
+            <th>Total</th>
+            <th>Acción</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for cotizacion in cotizaciones %}
+            <tr>
+              <td data-etiqueta="Código">{{ cotizacion.codigo }}{% if "DEMO · " in cotizacion.observaciones %} <span class="estado">Demo</span>{% endif %}</td>
+              <td data-etiqueta="Cliente">{{ cotizacion.nombre }}</td>
+              <td data-etiqueta="Fecha">{{ cotizacion.creada|date:"d-m-Y" }}</td>
+              <td data-etiqueta="Estado"><span class="estado estado--{{ cotizacion.estado }}">{{ cotizacion.get_estado_display }}</span></td>
+              <td data-etiqueta="Total">{{ cotizacion.total_texto }}</td>
+              <td data-etiqueta="Acción"><a class="interno-accion interno-accion--enlace ui-boton ui-boton--navegacion" href="{% url 'cotizacion_gestion' cotizacion.codigo %}">Ver detalle</a></td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p>Ninguna cotización coincide con la búsqueda.</p>
+  {% endif %}
+{% endblock %}

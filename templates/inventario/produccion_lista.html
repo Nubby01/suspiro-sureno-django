@@ -1,0 +1,55 @@
+{% extends "panel/indice.html" %}
+
+{% block panel_cuerpo %}
+  <details class="panel-ayuda">
+    <summary>Cómo se descuenta el inventario</summary>
+    <p>{{ regla }}</p>
+  </details>
+  <form class="interno-filtros" method="get" role="search">
+    {% if incluir_demo %}<input type="hidden" name="incluir_demo" value="1">{% endif %}
+    <div class="interno-filtros__campo">
+      <label for="id_estado">Estado</label>
+      <select id="id_estado" name="estado">
+        <option value="">Pendientes de entrega</option>
+        {% for valor, etiqueta in estados %}
+          <option value="{{ valor }}" {% if valor == estado %}selected{% endif %}>{{ etiqueta }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <button class="interno-filtros__buscar ui-boton" type="submit">Filtrar</button>
+  </form>
+  {% if pedidos %}
+    <div class="tabla-marco">
+      <table class="tabla-panel">
+        <thead>
+          <tr>
+            <th>Pedido</th>
+            <th>Cliente</th>
+            <th>Productos</th>
+            <th>Estado</th>
+            <th>Fecha</th>
+            <th>Acción</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for pedido in pedidos %}
+            <tr>
+              <td data-etiqueta="Pedido">{{ pedido.codigo }}</td>
+              <td data-etiqueta="Cliente">{{ pedido.nombre }}</td>
+              <td data-etiqueta="Productos">
+                {% for linea in pedido.lineas.all %}
+                  {{ linea.nombre_producto }} × {{ linea.cantidad }}{% if linea.detalle %} · {{ linea.detalle }}{% endif %}{% if not forloop.last %}; {% endif %}
+                {% endfor %}
+              </td>
+              <td data-etiqueta="Estado"><span class="estado estado--{{ pedido.estado }}">{{ pedido.get_estado_display }}</span></td>
+              <td data-etiqueta="Fecha">{{ pedido.creada|date:"d-m-Y H:i" }}</td>
+              <td data-etiqueta="Acción"><a class="produccion-gestionar ui-boton ui-boton--navegacion" aria-label="Gestionar pedido {{ pedido.codigo }}" href="{% url ruta_detalle pedido.codigo %}">Gestionar</a></td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p>No hay pedidos disponibles en este estado. Si eres ayudante, aquí aparecerán los pedidos que administración te asigne.</p>
+  {% endif %}
+{% endblock %}

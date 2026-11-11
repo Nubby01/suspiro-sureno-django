@@ -1,0 +1,15 @@
+{% load static %}
+<article class="tarjeta-categoria">
+  <a class="categoria-enlace" href="{% url 'catalogo' %}#{{ categoria.destino }}">
+    {% if categoria.imagen %}
+      <img class="categoria-imagen" src="{% static categoria.imagen %}" alt="{{ categoria.titulo }}" loading="lazy" decoding="async" width="640" height="480">
+    {% else %}
+      <div class="categoria-imagen categoria-imagen--vacia" aria-hidden="true">Suspiro Sureño</div>
+    {% endif %}
+    <div class="tarjeta-categoria__texto">
+      <h3>{{ categoria.titulo }}</h3>
+      {% if categoria.descripcion %}<p>{{ categoria.descripcion }}</p>{% endif %}
+      <span class="categoria-explorar">Explorar categoría <span aria-hidden="true">↗</span></span>
+    </div>
+  </a>
+</article>

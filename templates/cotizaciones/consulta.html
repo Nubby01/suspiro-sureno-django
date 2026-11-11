@@ -1,0 +1,36 @@
+{% extends "cuentas/_pagina.html" %}
+
+{% block titulo %}{{ cotizacion.codigo }} · Suspiro Sureño{% endblock %}
+{% block clase_pagina %}cuenta-pagina--cotizar{% endblock %}
+
+{% block cuenta %}
+  <header class="cuenta-intro">
+    <p class="kicker">Cotización</p>
+    <h1>{{ cotizacion.codigo }}</h1>
+    <p><span class="estado estado--{{ cotizacion.estado }}">{{ cotizacion.get_estado_display }}</span></p>
+    <p>Este enlace es privado. Guárdalo para consultar tu cotización.</p>
+  </header>
+  <section class="cuenta-seccion" aria-labelledby="titulo-resumen-consulta">
+    <h2 id="titulo-resumen-consulta">Resumen</h2>
+    <p>Fecha {{ cotizacion.creada|date:"d-m-Y H:i" }}</p>
+    <p>{{ cotizacion.nombre }} · {{ cotizacion.correo }} · {{ cotizacion.telefono }}</p>
+    {% for linea in cotizacion.lineas.all %}
+      <article class="linea-cotizacion linea-cotizacion--texto">
+        <div>
+          <h3>{{ linea.nombre_producto }}{% if linea.nombre_variante %} · {{ linea.nombre_variante }}{% endif %}</h3>
+          {% if linea.detalle %}<p>{{ linea.detalle }}</p>{% endif %}
+          <p>Cantidad {{ linea.cantidad }}. Precio {{ linea.precio_texto }}. Subtotal {{ linea.importe_texto }}.</p>
+        </div>
+      </article>
+    {% endfor %}
+    <p><strong>{{ cotizacion.total_texto }}</strong></p>
+    {% if cotizacion.observaciones %}<p>Observaciones: {{ cotizacion.observaciones }}</p>{% endif %}
+    {% if cotizacion.motivo %}<p>Motivo: {{ cotizacion.motivo }}</p>{% endif %}
+    <div class="cotizacion-acciones">
+      <a class="boton-cuenta ui-boton" href="{% url 'cotizacion_pdf' cotizacion.token %}">Descargar PDF</a>
+{% if whatsapp_url %}      <a class="boton-cuenta boton-cuenta--secundario ui-boton ui-boton--whatsapp" href="{{ whatsapp_url }}" rel="noopener noreferrer">Consultar por WhatsApp</a>{% endif %}
+      <a class="boton-cuenta boton-cuenta--secundario ui-boton ui-boton--contorno" href="{% url 'catalogo' %}">Volver al catálogo</a>
+    </div>
+    {% if whatsapp_url %}<p class="ayuda">WhatsApp se abre con un mensaje listo. El envío lo confirmas tú dentro de WhatsApp.</p>{% endif %}
+  </section>
+{% endblock %}

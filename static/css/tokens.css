@@ -1,0 +1,21 @@
+/* Tokens iniciales — Suspiro Sureño 2.0 */
+
+:root {
+  --terracota: #994215;
+  --crema: #f7f1e8;
+  --beige-rose: #e3d6c5;
+  --chocolate: #352821;
+  --durazno: #f3b38f;
+  --verde-salvia: #8d957e;
+  --blanco: #ffffff;
+
+  --fondo: var(--crema);
+  --superficie: var(--blanco);
+  --texto: var(--chocolate);
+  --marca: var(--terracota);
+  --error: #9c2f2f;
+
+  --fuente: "DM Sans", "Segoe UI", sans-serif;
+  --fuente-display: "DM Serif Display", Georgia, serif;
+  --radio: 15px;
+}

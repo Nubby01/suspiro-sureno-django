@@ -1,0 +1,5 @@
+{% if boton.activo %}
+  <a class="boton boton--{{ variante }} ui-boton{% if variante == 'contorno' %} ui-boton--contorno{% elif variante == 'durazno' %} ui-boton--secundario{% endif %}" href="{{ boton.url }}">{{ boton.etiqueta }}</a>
+{% else %}
+  <button type="button" class="boton boton--{{ variante }} ui-boton{% if variante == 'contorno' %} ui-boton--contorno{% elif variante == 'durazno' %} ui-boton--secundario{% endif %}" disabled{% if nota %} aria-describedby="{{ nota }}"{% endif %}>{{ boton.etiqueta }}</button>
+{% endif %}

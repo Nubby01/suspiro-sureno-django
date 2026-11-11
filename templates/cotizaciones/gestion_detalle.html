@@ -1,0 +1,94 @@
+{% extends "panel/indice.html" %}
+{% load interfaz %}
+
+{% block panel_cuerpo %}
+  <p class="interno__acciones">
+    <a class="ui-boton ui-boton--navegacion" href="{% url 'cotizaciones_gestion' %}">Volver al listado</a>
+    <a class="ui-boton ui-boton--navegacion" href="{% url 'cotizacion_pdf_gestion' cotizacion.codigo %}">Descargar PDF</a>
+  </p>
+  <dl class="ficha">
+    <div><dt>Estado</dt><dd><span class="estado estado--{{ cotizacion.estado }}">{{ cotizacion.get_estado_display }}</span></dd></div>
+    <div><dt>Fecha</dt><dd>{{ cotizacion.creada|date:"d-m-Y H:i" }}</dd></div>
+    <div><dt>Contacto</dt><dd>{{ cotizacion.nombre }} · {{ cotizacion.correo }} · {{ cotizacion.telefono }}</dd></div>
+    <div><dt>Total</dt><dd>{{ cotizacion.total_texto }}</dd></div>
+    {% if cotizacion.observaciones %}<div><dt>Observaciones</dt><dd>{{ cotizacion.observaciones }}</dd></div>{% endif %}
+    {% if cotizacion.motivo %}<div><dt>Motivo</dt><dd>{{ cotizacion.motivo }}</dd></div>{% endif %}
+    <div><dt>Enlace privado</dt><dd><a class="ui-boton ui-boton--navegacion" href="{% url 'cotizacion_consulta' cotizacion.token %}">Abrir consulta</a></dd></div>
+  </dl>
+
+  {% if abierta %}
+    <form class="panel-form formulario-amplio panel-form--ancho" method="post" novalidate>
+      {% csrf_token %}
+      <h2>Precios acordados</h2>
+      {% if precios.non_field_errors %}
+        <div class="mensaje-error" role="alert">{{ precios.non_field_errors }}</div>
+      {% endif %}
+      {% for campo in precios %}
+        <div class="campo{% if campo.widget_type == 'textarea' %} campo--ancho{% endif %}">
+          <label for="{{ campo.id_for_label }}">{{ campo.label }}</label>
+          {{ campo|campo_ui }}
+          {% if campo.help_text %}<p class="ayuda">{{ campo.help_text }}</p>{% endif %}
+          {% if campo.errors %}<ul class="errorlist" role="alert">{% for error in campo.errors %}<li>{{ error }}</li>{% endfor %}</ul>{% endif %}
+        </div>
+      {% endfor %}
+      <button class="panel-enviar ui-boton ui-boton--guardar" type="submit" name="accion" value="precios">Guardar precios</button>
+    </form>
+    <form class="panel-form formulario-amplio" method="post">
+      {% csrf_token %}
+      <h2>Confirmar cotización</h2>
+      <p>Comprueba el detalle y los precios antes de confirmar.</p>
+      <button class="panel-enviar ui-boton ui-boton--guardar" type="submit" name="accion" value="confirmar">Confirmar cotización</button>
+    </form>
+  {% endif %}
+
+  {% if abierta or confirmada %}
+    <form class="panel-form formulario-amplio" method="post" novalidate>
+      {% csrf_token %}
+      <h2>Rechazar o cancelar</h2>
+      {% for campo in motivo %}
+        <div class="campo{% if campo.widget_type == 'textarea' %} campo--ancho{% endif %}">
+          <label for="{{ campo.id_for_label }}">{{ campo.label }}</label>
+          {{ campo|campo_ui }}
+          {% if campo.errors %}<ul class="errorlist" role="alert">{% for error in campo.errors %}<li>{{ error }}</li>{% endfor %}</ul>{% endif %}
+        </div>
+      {% endfor %}
+      {% if abierta %}
+        <button class="panel-enviar ui-boton ui-boton--aviso" type="submit" name="accion" value="rechazar">Rechazar</button>
+      {% endif %}
+      <button class="panel-enviar ui-boton ui-boton--aviso" type="submit" name="accion" value="cancelar">Cancelar</button>
+    </form>
+  {% endif %}
+
+  {% if confirmada %}
+    <form class="panel-form formulario-amplio" method="post">
+      {% csrf_token %}
+      <button class="panel-enviar ui-boton" type="submit" name="accion" value="convertir">Convertir en pedido</button>
+    </form>
+  {% endif %}
+
+  <h2>Productos</h2>
+  <div class="tabla-marco">
+    <table class="tabla-panel">
+      <thead>
+        <tr>
+          <th>Producto</th>
+          <th>Presentación</th>
+          <th>Cantidad</th>
+          <th>Precio</th>
+          <th>Importe</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for linea in cotizacion.lineas.all %}
+          <tr>
+            <td data-etiqueta="Producto">{{ linea.nombre_producto }}</td>
+            <td data-etiqueta="Presentación">{{ linea.nombre_variante|default:"—" }}{% if linea.detalle %} · {{ linea.detalle }}{% endif %}</td>
+            <td data-etiqueta="Cantidad">{{ linea.cantidad }}</td>
+            <td data-etiqueta="Precio">{{ linea.precio_texto }}</td>
+            <td data-etiqueta="Importe">{{ linea.importe_texto }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}
