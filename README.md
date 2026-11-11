@@ -1,72 +1,216 @@
-# Suspiro Sureño 2.0 — Proyecto B
+# 🍰 Suspiro Sureño 2.0 — Proyecto B
 
-Copia independiente. No modifica Proyecto A ni conecta servicios externos.
+Sistema web de gestión para una pastelería, desarrollado con **Python y Django** como parte de un proyecto académico de Ingeniería en Informática.
 
-## Inicio local en Windows
+La aplicación permite presentar productos de repostería mediante un catálogo público y gestionar información relacionada con clientes, cotizaciones, pedidos e inventario.
 
-Extraer en una carpeta nueva y abrirla en VS Code. En su terminal:
+## 🌐 Enlaces del proyecto
 
-```powershell
-py -m venv .venv
-.\.venv\Scripts\python.exe -m pip install -r requirements.txt
-Copy-Item .env.example .env
-.\.venv\Scripts\python.exe manage.py migrate
-.\.venv\Scripts\python.exe manage.py createsuperuser
-.\.venv\Scripts\python.exe manage.py check
-.\.venv\Scripts\python.exe manage.py test
-.\.venv\Scripts\python.exe manage.py runserver 127.0.0.1:8001
+- **Página web:** https://suspiro-sureno-django.vercel.app/
+- **Catálogo:** https://suspiro-sureno-django.vercel.app/catalogo/
+- **Django Admin:** https://suspiro-sureno-django.vercel.app/admin/
+- **Repositorio:** https://github.com/Nubby01/suspiro-sureno-django
+
+## 🎯 Objetivo
+
+Desarrollar una plataforma web que contribuya a digitalizar y organizar los procesos de una pastelería, facilitando la presentación de productos, la gestión de cotizaciones y pedidos, y el control de insumos.
+
+## 🛠️ Tecnologías utilizadas
+
+| Tecnología | Uso |
+|---|---|
+| Python | Lenguaje de programación |
+| Django 5.2 LTS | Framework backend |
+| HTML y CSS | Estructura y presentación |
+| SQLite | Base de datos de desarrollo local |
+| PostgreSQL | Base de datos de producción |
+| Neon | Alojamiento de PostgreSQL |
+| Vercel | Despliegue de la aplicación |
+| Git y GitHub | Control de versiones |
+
+## ✨ Funcionalidades principales
+
+### Catálogo de productos
+
+- Visualización pública de productos.
+- Organización por categorías.
+- Variantes y precios de productos.
+- Productos activos e inactivos.
+- Visualización de precios pendientes como «Consultar precio».
+
+### Usuarios y autenticación
+
+- Registro de clientes.
+- Inicio y cierre de sesión.
+- Administración de cuentas.
+- Acceso a funcionalidades según los permisos implementados.
+
+### Cotizaciones
+
+- Registro de cotizaciones.
+- Asociación de productos y cantidades.
+- Consulta de información y estados.
+
+### Pedidos
+
+- Gestión de pedidos.
+- Registro de productos asociados.
+- Seguimiento mediante eventos del pedido.
+
+### Inventario
+
+- Registro de insumos.
+- Movimientos de inventario.
+- Recetas e ingredientes.
+- Registro de consumo de insumos asociado a pedidos.
+
+### Administración
+
+El sistema dispone de Django Admin y funcionalidades administrativas propias del proyecto para gestionar los registros según los permisos correspondientes.
+
+Los permisos específicos del rol ayudante y algunas reglas operativas requieren validación y pruebas adicionales.
+
+## 📁 Estructura general
+
+```text
+suspiro-sureno-django/
+├── apps/
+│   ├── catalogo/
+│   ├── cuentas/
+│   ├── cotizaciones/
+│   ├── inventario/
+│   └── pedidos/
+├── config/
+├── static/
+├── manage.py
+├── requirements.txt
+├── vercel.json
+└── .python-version
 ```
 
-Abrir http://127.0.0.1:8001/ . No se incluye base de datos ni cuentas reales.
-Para el catálogo inicial: `python manage.py importar_catalogo_fotografias` (consultar `--help` y revisar sus resultados antes de cargar precios). No se inventan recetas ni precios.
+## 💻 Instalación local
 
-## Roles y trabajo asignado
+### 1. Clonar el repositorio
 
-Existen los roles clienta, ayudante y administradora; un superusuario accede a gestión.
-Administración crea ayudantes en Personal. En Producción → Gestionar, selecciona una ayudante activa y guarda la asignación; Sin asignar la retira.
-La ayudante ve únicamente sus pedidos pendientes en Trabajo asignado y Producción. El acceso directo a otro pedido devuelve 404. Puede registrar los avances existentes; no asignar, cancelar ni cambiar precios.
-El consumo sigue ocurriendo una sola vez al iniciar preparación, con receta y stock suficientes.
+```bash
+git clone https://github.com/Nubby01/suspiro-sureno-django.git
+cd suspiro-sureno-django
+```
 
-## Privacidad y configuración
+### 2. Crear el entorno virtual
 
-La entrega excluye SQLite, .env, entornos virtuales, historial Git y cachés.
-Los contactos personales antes incrustados se retiraron. Completar NEGOCIO_* en .env local; los enlaces de contacto vacíos no se muestran. No publicar .env.
-Si se aplica el código a otra copia con datos, respaldarla y ejecutar `manage.py migrate` para agregar responsable; los pedidos existentes quedan sin asignar.
+```powershell
+py -3.12 -m venv .venv
+```
 
-Ver CAMBIOS.md para alcance, archivos y pendientes verificables.
+### 3. Activar el entorno virtual
 
+En Windows PowerShell:
 
-## Continuación del Bloque 13
+```powershell
+.\.venv\Scripts\Activate.ps1
+```
 
-Ver `BLOQUE13.md` para la auditoría, los grupos de cambios, archivos y verificaciones.
-Esta actualización incorpora `reportlab==5.1.0` para el PDF comercial. Ya está instalado en el entorno local de trabajo. En otra instalación ejecutar `python -m pip install -r requirements.txt`.
-La etapa visual inicial no necesitó migraciones; la ampliación de abastecimientos descrita más abajo sí las requiere. Conserva la base restaurada existente; el paquete de cambios no contiene SQLite ni configuraciones privadas.
-Después de abrir el sitio, actualizar con Ctrl+F5 para obtener los estilos nuevos.
+### 4. Instalar las dependencias
 
+```bash
+pip install -r requirements.txt
+```
 
-## Ampliación funcional de Bloque 13
+### 5. Configurar la base de datos
 
-Ver `BLOQUE13-AMPLIACION.md` para funcionalidades, verificación y conservación de datos.
-La migración `inventario.0002_abastecimientos_stock_critico` es necesaria para los nuevos umbrales y la trazabilidad. Ya está aplicada en esta carpeta. En otra instalación, respaldar SQLite y ejecutar `python manage.py migrate` antes de abrir la aplicación.
-Los contactos públicos autorizados están en la configuración `.env` local. Conservar ese archivo; no se incluye en los paquetes de código.
-Stock crítico: configurar un umbral absoluto opcional en cada insumo, entre cero y el mínimo. Agotado se muestra aparte. Sin configuración no se inventa un umbral crítico.
-Los lotes y datos de compra se registran desde las entradas nuevas. La existencia previa y los ajustes positivos se conservan como saldo sin lote. FEFO descuenta primero las caducidades conocidas más próximas, luego los lotes sin fecha y finalmente el saldo sin lote; las fechas son informativas y no cambian las reglas de producción.
-Los registros DEMO se ocultan en listas operativas; activar Mostrar registros de demostración para revisarlos. No se eliminaron.
-Actualizar el navegador con Ctrl+F5.
+El proyecto utiliza SQLite para desarrollo local y PostgreSQL en Neon para producción.
 
+Las credenciales de producción se configuran mediante variables de entorno y no deben incorporarse al repositorio.
 
-## Ajustes finales antes del despliegue
+Para trabajar localmente con SQLite, asegúrate de que no exista una configuración activa que apunte a Neon de producción.
 
-Ver `BLOQUE13-AJUSTES-FINALES.md` para cambios y verificación. Esta etapa no añade migraciones ni cambia datos o reglas comerciales. El indicador de cotización volvió al menú principal. Centro y sabores tienen un selector progresivo; si el navegador no admite Popover, se conserva el select nativo. Los demás selectores siguen nativos con campos y focos coherentes.
-Los cambios están aplicados localmente; no se desplegó. Recargar con Ctrl+F5 para obtener los recursos actualizados. La revisión en dispositivos físicos, Safari/iOS y lectores de pantalla reales no está incluida en las pruebas realizadas.
+### 6. Aplicar las migraciones
 
+```bash
+python manage.py migrate
+```
 
-### Desplegables y contador de cotización
+### 7. Crear un superusuario local
 
-Todos los desplegables simples del sitio y panel utilizan el menú cálido compartido, con teclado y respaldo nativo si Popover no está disponible. Se conservan los controles múltiples y las listas de varias filas.
-La insignia de Ver cotización se muestra solamente cuando hay presentaciones seleccionadas; al quitar la última desaparece. Se mantiene el enlace visible y la persistencia de sesión existente.
+```bash
+python manage.py createsuperuser
+```
 
+### 8. Iniciar el servidor
 
-## Bloque 14: preparación de despliegue
+```bash
+python manage.py runserver
+```
 
-Ver [BLOQUE14-PREPARACION-DESPLIEGUE.md](BLOQUE14-PREPARACION-DESPLIEGUE.md) para Vercel, Neon, variables, ensayos y pendientes de seguridad; y [BLOQUE14-ARCHIVOS-Y-LIMPIEZA.md](BLOQUE14-ARCHIVOS-Y-LIMPIEZA.md) antes de retirar archivos. La preparación no publica el proyecto ni modifica la base local.
+La aplicación estará disponible en:
+
+http://127.0.0.1:8000/
+
+El administrador local estará disponible en:
+
+http://127.0.0.1:8000/admin/
+
+## ☁️ Despliegue
+
+La aplicación está desplegada en Vercel y utiliza PostgreSQL alojado en Neon.
+
+La configuración de producción contempla las siguientes variables:
+
+| Variable | Descripción |
+|---|---|
+| `DATABASE_URL` | Conexión a PostgreSQL |
+| `DJANGO_SECRET_KEY` | Clave secreta de Django |
+| `DJANGO_DEBUG` | Configuración del modo depuración |
+| `DJANGO_ALLOWED_HOSTS` | Dominios autorizados |
+| `DJANGO_CSRF_TRUSTED_ORIGINS` | Orígenes HTTPS autorizados |
+| `DJANGO_LOAD_ENV` | Control de carga de variables locales |
+
+Las contraseñas, claves secretas y cadenas de conexión no deben publicarse en GitHub.
+
+## 🗃️ Datos de demostración
+
+La base de datos desplegada contiene información ficticia para demostrar el funcionamiento de la aplicación.
+
+Incluye:
+
+- 7 usuarios, incluido un administrador.
+- 7 categorías.
+- 27 productos.
+- 35 variantes.
+- 10 insumos.
+- 8 cotizaciones.
+- 6 pedidos.
+- Recetas, movimientos de inventario y eventos asociados.
+
+Estos registros no corresponden a operaciones comerciales reales.
+
+## 🔒 Seguridad
+
+- Uso de variables de entorno para datos sensibles.
+- Autenticación de usuarios mediante Django.
+- Acceso administrativo restringido.
+- Protección CSRF de Django.
+- Separación entre las bases de datos de desarrollo y producción.
+
+Los archivos de respaldo, exportaciones de datos y credenciales deben mantenerse fuera del repositorio público.
+
+## 📌 Estado del proyecto
+
+**Aplicación desplegada y operativa para demostración académica.**
+
+Se ha verificado el acceso administrativo desde Vercel, la conexión con Neon y la importación de los datos de demostración.
+
+Quedan pendientes de comprobación final los permisos de los distintos roles, algunos flujos administrativos y la información de contacto del sitio.
+
+## 🎓 Contexto académico
+
+Suspiro Sureño 2.0 — Proyecto B forma parte de un trabajo académico de Ingeniería en Informática.
+
+Esta implementación utiliza Django y mantiene su propio repositorio y base de datos, de manera independiente del Proyecto A.
+
+---
+
+**Suspiro Sureño 2.0 — Proyecto B**
+
+*Tecnología para apoyar la gestión de una pastelería.*
