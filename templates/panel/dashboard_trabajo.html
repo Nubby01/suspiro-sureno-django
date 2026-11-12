@@ -1,0 +1,21 @@
+{% extends "panel/indice.html" %}
+{% load static %}
+{% block estilos_extra %}{{ block.super }}<link rel="stylesheet" href="{% static 'css/dashboard.css' %}?v=dashboard-1">{% endblock %}
+{% block panel_intro %}{% endblock %}
+{% block panel_cuerpo %}
+<div class="dashboard dashboard--trabajo">
+  <header class="dashboard__cabecera"><div><p class="dashboard__kicker">Área de trabajo{% if cuenta.first_name %} · {{ cuenta.first_name }}{% endif %}</p><h1>Tu jornada en el taller</h1><p class="dashboard__periodo">Tus pedidos, su preparación y el siguiente paso.</p></div><span class="dashboard__emblema">{% include "panel/_icono_dashboard.html" with icono="preparacion" %}</span></header>
+  <section class="dashboard__metricas" aria-label="Resumen de tus pedidos asignados">
+    <a class="dashboard-metrica" href="{% url 'trabajo_asignado' %}"><span class="dashboard-metrica__nombre">Trabajo asignado {% include "panel/_icono_dashboard.html" with icono="cotizaciones" %}</span><strong>{{ jornada.asignados }}</strong><span class="dashboard-metrica__nota">Pedidos pendientes a tu cargo</span></a>
+    <a class="dashboard-metrica" href="{% url 'produccion_trabajo' %}?estado=recibido"><span class="dashboard-metrica__nombre">Por comenzar {% include "panel/_icono_dashboard.html" with icono="reloj" %}</span><strong>{{ jornada.recibidos }}</strong><span class="dashboard-metrica__nota">Recibidos y asignados a ti</span></a>
+    <a class="dashboard-metrica" href="{% url 'produccion_trabajo' %}?estado=en_preparacion"><span class="dashboard-metrica__nombre">En preparación {% include "panel/_icono_dashboard.html" with icono="preparacion" %}</span><strong>{{ jornada.preparacion }}</strong><span class="dashboard-metrica__nota">Pedidos en los que estás trabajando</span></a>
+    <a class="dashboard-metrica" href="{% url 'produccion_trabajo' %}?estado=listo"><span class="dashboard-metrica__nombre">Listos para entregar {% include "panel/_icono_dashboard.html" with icono="listo" %}</span><strong>{{ jornada.listos }}</strong><span class="dashboard-metrica__nota">Preparación terminada</span></a>
+  </section>
+  <section class="dashboard-tarjeta"><header class="dashboard-tarjeta__cabecera"><h2>Tu trabajo pendiente</h2><a href="{% url 'trabajo_asignado' %}">Ver todo <span aria-hidden="true">↗</span></a></header>
+    {% if jornada.pedidos %}<p class="dashboard__ayuda">Primero los pedidos asignados con mayor antigüedad.</p><ul class="dashboard-tareas">{% for pedido in jornada.pedidos %}<li><div class="dashboard-tareas__encabezado"><strong>{{ pedido.codigo }}</strong><span class="estado estado--{{ pedido.estado }}">{{ pedido.get_estado_display }}</span></div><p>{% for linea in pedido.lineas.all %}{{ linea.nombre_producto }} × {{ linea.cantidad }}{% if not forloop.last %} · {% endif %}{% endfor %}</p><a href="{% url 'produccion_trabajo_detalle' pedido.codigo %}">Revisar pedido <span class="saltar">{{ pedido.codigo }}</span><span aria-hidden="true">↗</span></a></li>{% endfor %}</ul>
+    {% else %}<div class="dashboard-vacio"><span class="dashboard-vacio__icono">{% include "panel/_icono_dashboard.html" with icono="listo" %}</span><h3>Todo al día por aquí</h3><p>No tienes pedidos pendientes asignados. Cuando administración te asigne uno, lo verás en este espacio.</p></div>{% endif %}
+  </section>
+  <section class="dashboard-cierre" aria-label="Entregas de tus pedidos"><span class="dashboard__emblema">{% include "panel/_icono_dashboard.html" with icono="listo" %}</span><div><h2>{{ jornada.entregados }} pedido{{ jornada.entregados|pluralize:"s" }} entregado{{ jornada.entregados|pluralize:"s" }}</h2><p>De los pedidos a tu cargo, en los últimos 30 días.</p></div><a href="{% url 'produccion_trabajo' %}">Ver producción <span aria-hidden="true">↗</span></a></section>
+  <p class="dashboard__pie">Este resumen muestra únicamente tus asignaciones y excluye los registros de demostración.</p>
+</div>
+{% endblock %}

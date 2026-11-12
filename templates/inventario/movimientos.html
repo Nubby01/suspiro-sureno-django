@@ -1,6 +1,7 @@
 {% extends "panel/indice.html" %}
 
 {% block panel_cuerpo %}
+  <p><a class="ui-boton ui-boton--navegacion" href="{% url 'inventario_consumos' %}">Reporte de insumos utilizados</a></p>
   <p class="interno__acciones"><a class="ui-boton ui-boton--navegacion" href="{% url 'inventario_gestion' %}">Volver al inventario</a></p>
   {% if movimientos %}
     <ul class="cuenta-lista">

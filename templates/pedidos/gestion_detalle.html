@@ -10,6 +10,7 @@
     <div><dt>Fecha</dt><dd>{{ pedido.creada|date:"d-m-Y H:i" }}</dd></div>
     <div><dt>Contacto</dt><dd>{{ pedido.nombre }} · {{ pedido.correo }} · {{ pedido.telefono }}</dd></div>
     <div><dt>Total confirmado</dt><dd>{{ pedido.total_texto }}</dd></div>
+    <div><dt>Venta</dt><dd>{% if pedido.venta %}<span class="estado estado--entregado">{% if pedido.es_demostracion %}Venta de demostración{% else %}Venta realizada{% endif %}</span> · {{ pedido.venta.total_texto }}<br>{{ pedido.venta.fecha|date:"d-m-Y H:i" }}{% if pedido.venta.fecha_estimada %} · Fecha histórica estimada{% endif %}<p class="ayuda">Cobro reconocido al quedar Recibido o Entregado. No vuelve a sumarse al avanzar de estado. Cancelar no registra una devolución de dinero.{% if pedido.es_demostracion %} Este ejemplo no se suma a los indicadores comerciales.{% endif %}</p>{% else %}Sin venta registrada{% endif %}</dd></div>
     <div><dt>Cotización</dt><dd>{{ pedido.cotizacion.codigo }}</dd></div>
   </dl>
   <h2>Productos</h2>

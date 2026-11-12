@@ -1,0 +1,43 @@
+{% extends "panel/indice.html" %}
+{% load static %}
+{% block estilos_extra %}{{ block.super }}<link rel="stylesheet" href="{% static 'css/dashboard.css' %}?v=preparados-1">{% endblock %}
+{% block panel_intro %}{% endblock %}
+{% block panel_cuerpo %}
+<div class="dashboard">
+  <header class="dashboard__cabecera">
+    <div><p class="dashboard__kicker">Área de administración</p><h1>Estadísticas comerciales</h1><p class="dashboard__periodo">Últimos 30 días · {{ comercial.desde|date:"d M" }} – {{ comercial.hasta|date:"d M Y" }}</p></div>
+    <span class="dashboard__emblema">{% include "panel/_icono_dashboard.html" with icono="grafico" %}</span>
+  </header>
+  <section class="dashboard__metricas" aria-label="Indicadores comerciales de los últimos 30 días">
+    <a class="dashboard-metrica" href="{% url 'pedidos_gestion' %}?ventas=1&amp;periodo=30"><span class="dashboard-metrica__nombre">Ventas {% include "panel/_icono_dashboard.html" with icono="ventas" %}</span><strong>{{ comercial.ventas }}</strong><span class="dashboard-metrica__nota">Pedidos cobrados desde Recibido, sin duplicados</span></a>
+    <a class="dashboard-metrica" href="{% url 'cotizaciones_gestion' %}"><span class="dashboard-metrica__nombre">Cotizaciones {% include "panel/_icono_dashboard.html" with icono="cotizaciones" %}</span><strong>{{ comercial.cotizaciones }}</strong><span class="dashboard-metrica__nota">Solicitudes recibidas en el período</span></a>
+    <section class="dashboard-metrica" aria-labelledby="titulo-preparados"><span class="dashboard-metrica__nombre" id="titulo-preparados">Productos más preparados {% include "panel/_icono_dashboard.html" with icono="preparacion" %}</span>
+      {% if comercial.preparados %}<ol class="dashboard-preparados">{% for producto in comercial.preparados %}<li><span>{{ producto.nombre_producto }}{% if producto.nombre_variante %} · {{ producto.nombre_variante }}{% endif %}</span><strong>{{ producto.unidades }}</strong></li>{% endfor %}</ol>{% else %}<p class="dashboard-metrica__nota">Aún no hay preparaciones terminadas en este período.</p>{% endif %}
+      <span class="dashboard-metrica__nota">Primera transición a Listo · cantidades de la presentación vendida; una caja cuenta como una caja.</span></section>
+    <a class="dashboard-metrica dashboard-metrica--importe" href="{% url 'pedidos_gestion' %}?ventas=1&amp;periodo=30"><span class="dashboard-metrica__nombre">Ingresos {% include "panel/_icono_dashboard.html" with icono="ingresos" %}</span><strong>{{ comercial.ingresos }}</strong><span class="dashboard-metrica__nota">Total cobrado de las ventas del período · CLP</span></a>
+  </section>
+  <section class="dashboard-tarjeta" aria-labelledby="titulo-vendidos">
+    <header class="dashboard-tarjeta__cabecera"><h2 id="titulo-vendidos">Productos más vendidos</h2><span>Últimos 30 días</span></header>
+    {% if comercial.productos %}<ol class="dashboard-ranking">{% for producto in comercial.productos %}<li><div><span>{{ producto.nombre_producto }}</span><strong>{{ producto.unidades }} unidad{{ producto.unidades|pluralize:"es" }}</strong></div><div class="dashboard-ranking__pista" aria-hidden="true"><span style="width: {{ producto.porcentaje }}%"></span></div></li>{% endfor %}</ol><p class="dashboard__ayuda">Unidades vendidas desde Recibido o Entregado. Cada pedido cuenta una vez; las barras se comparan con el producto más vendido.</p>
+    {% else %}<div class="dashboard-vacio"><span class="dashboard-vacio__icono">{% include "panel/_icono_dashboard.html" with icono="grafico" %}</span><h3>Aún no hay ventas en este período</h3><p>Los productos aparecerán aquí cuando un pedido quede Recibido o Entregado.</p><a href="{% url 'produccion_gestion' %}">Ver producción <span aria-hidden="true">↗</span></a></div>{% endif %}
+  </section>
+  <section class="dashboard-tarjeta" aria-labelledby="titulo-taller"><header class="dashboard-tarjeta__cabecera"><h2 id="titulo-taller">El taller, de un vistazo</h2><span>Estado actual</span></header>
+    <div class="dashboard-operacion">
+      <a href="{% url 'cotizaciones_gestion' %}"><strong>{{ resumen.cotizaciones_abiertas }}</strong><span>Cotizaciones abiertas</span></a>
+      <a href="{% url 'pedidos_gestion' %}?estado=recibido"><strong>{{ resumen.pedidos.recibido }}</strong><span>Pedidos recibidos</span></a>
+      <a href="{% url 'produccion_gestion' %}?estado=en_preparacion"><strong>{{ resumen.pedidos.en_preparacion }}</strong><span>En preparación</span></a>
+      <a href="{% url 'produccion_gestion' %}?estado=listo"><strong>{{ resumen.pedidos.listo }}</strong><span>Listos para entregar</span></a>
+    </div>
+  </section>
+  <div class="dashboard__columnas">
+    <section class="dashboard-tarjeta"><header class="dashboard-tarjeta__cabecera"><h2>Pedidos recientes</h2><a href="{% url 'pedidos_gestion' %}">Ver todos <span aria-hidden="true">↗</span></a></header>
+      {% if resumen.recientes %}<ul class="dashboard-pedidos">{% for pedido in resumen.recientes %}<li><a href="{% url 'pedido_gestion' pedido.codigo %}"><strong>{{ pedido.codigo }}</strong><span>{{ pedido.nombre }}</span></a><span class="estado estado--{{ pedido.estado }}">{{ pedido.get_estado_display }}</span></li>{% endfor %}</ul>{% else %}<p class="dashboard__ayuda">Todavía no hay pedidos comerciales.</p>{% endif %}
+    </section>
+    <section class="dashboard-tarjeta"><header class="dashboard-tarjeta__cabecera"><h2>Insumos bajo mínimo</h2><span class="dashboard__cantidad">{{ resumen.bajos }}</span></header>
+      {% if resumen.alertas_stock %}<ul class="dashboard-stock">{% for insumo in resumen.alertas_stock %}<li><a href="{% url 'inventario_ficha' insumo.pk %}">{{ insumo.nombre }}</a><span>{{ insumo.existencia }} {{ insumo.get_unidad_display }} · <strong class="stock--{{ insumo.nivel_stock }}">{{ insumo.etiqueta_stock }}</strong></span></li>{% endfor %}</ul>{% else %}<p class="dashboard__ayuda">No hay insumos activos bajo el mínimo configurado.</p>{% endif %}
+      <a class="dashboard__enlace" href="{% url 'inventario_entrada' %}">Registrar abastecimiento <span aria-hidden="true">↗</span></a>
+    </section>
+  </div>
+  <p class="dashboard__pie">Datos reales del sistema. Los registros de demostración se excluyen de los indicadores.</p>
+</div>
+{% endblock %}

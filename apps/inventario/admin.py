@@ -3,9 +3,10 @@ import secrets
 from django import forms
 from django.contrib import admin
 from django.core.exceptions import ValidationError
+from django.forms.models import BaseInlineFormSet
 
 from .models import ConsumoPedido, Insumo, MovimientoInventario, Receta, RecetaIngrediente
-from .servicios import MENSAJE_EXISTENCIA, MENSAJE_INACTIVO, guardar_insumo, registrar_movimiento
+from .servicios import MENSAJE_EXISTENCIA, MENSAJE_INACTIVO, guardar_insumo, registrar_movimiento, validar_insumo_comercial
 
 
 class InsumoAdmin(admin.ModelAdmin):
@@ -89,8 +90,20 @@ class MovimientoInventarioAdmin(admin.ModelAdmin):
         return False
 
 
+class IngredientesSegurosFormSet(BaseInlineFormSet):
+    def clean(self):
+        super().clean()
+        if any(self.errors) or self.instance.alcance.startswith("ejemplo:"):
+            return
+        for formulario in self.forms:
+            datos = formulario.cleaned_data
+            if not datos.get("DELETE") and datos.get("insumo"):
+                validar_insumo_comercial(datos["insumo"])
+
+
 class IngredienteInline(admin.TabularInline):
     model = RecetaIngrediente
+    formset = IngredientesSegurosFormSet
     extra = 1
 
 

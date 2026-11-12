@@ -41,6 +41,8 @@ class AsignacionTests(TestCase):
         self.client.post(url, {"accion": "asignar", "responsable": self.ayudante.pk})
         pedido.refresh_from_db()
         self.assertEqual(pedido.responsable, self.ayudante)
+        self.assertEqual(pedido.eventos.get().usuario, self.administradora)
+        self.assertIn("Asignación:", pedido.eventos.get().nota)
         self.ayudante.is_active = False
         self.ayudante.save()
         self.client.post(url, {"accion": "asignar", "responsable": ""})

@@ -48,7 +48,7 @@ class AbastecimientoTests(TestCase):
         self.assertEqual(self.insumo.existencia,0)
         self.assertFalse(MovimientoInventario.objects.exists())
         self.assertFalse(Abastecimiento.objects.exists())
-        movimiento=self.entrada("valida",es_compra=True,fecha_compra=date(2026,1,1),precio_compra=100,proveedor="Proveedor QA")
+        movimiento=self.entrada("valida",es_compra=True,fecha_compra=date(2026,1,1),precio_compra=100,proveedor="Proveedor QA",tipo_referencia="interna",referencia_compra="COMPRA-QA")
         self.assertTrue(movimiento.abastecimiento.es_compra)
         self.assertIsNone(movimiento.abastecimiento.caducidad)
 

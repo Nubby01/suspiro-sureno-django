@@ -6,11 +6,34 @@ a «En preparación», mediante las reglas provisionales de inventario.
 
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError, OperationalError, transaction
+from django.db.models import F
+from django.utils import timezone
 
 from apps.cotizaciones.models import Cotizacion
 from apps.cotizaciones.servicios import MENSAJE_PENDIENTE
 
-from .models import EventoPedido, LineaPedido, Pedido
+from .models import EventoPedido, LineaPedido, Pedido, VentaPedido
+
+
+def registrar_venta(*, pedido, usuario=None):
+    """Reconoce el ingreso completo una vez, sin modificar precios ni existencias.
+
+    La operación normal llama dentro de la transacción y bloqueo del pedido.
+    Si se repara un pedido antiguo se toma su primer evento comercial real.
+    """
+    evento = pedido.eventos.filter(estado_nuevo__in=(Pedido.Estado.RECIBIDO, Pedido.Estado.ENTREGADO)).exclude(
+        estado_anterior=F("estado_nuevo")
+    ).order_by("creada", "pk").first()
+    if evento is None and pedido.estado not in (Pedido.Estado.RECIBIDO, Pedido.Estado.ENTREGADO):
+        return None
+    venta, _ = VentaPedido.objects.get_or_create(pedido=pedido, defaults={
+        "total": pedido.total,
+        "fecha": evento.creada if evento else pedido.creada or timezone.now(),
+        "usuario": evento.usuario if evento else usuario if getattr(usuario, "is_authenticated", False) else None,
+        "estado_origen": evento.estado_nuevo if evento else pedido.estado,
+        "fecha_estimada": evento is None,
+    })
+    return venta
 
 MENSAJE_DUPLICADO = "Esta cotización ya tiene un pedido."
 MENSAJE_NO_CONFIRMADA = "Solo se puede convertir una cotización confirmada."
@@ -76,6 +99,7 @@ def _convertir_confirmada(*, cotizacion, usuario):
         usuario=usuario if getattr(usuario, "is_authenticated", False) else None,
         nota="Pedido creado desde la cotización.",
     )
+    registrar_venta(pedido=pedido, usuario=usuario)
     return pedido
 
 
@@ -99,6 +123,8 @@ def _cambiar_estado(*, pedido, estado, usuario, nota):
 
         consumir_para_preparacion(pedido=pedido, usuario=usuario)
     anterior = pedido.estado
+    if anterior == Pedido.Estado.RECIBIDO:
+        registrar_venta(pedido=pedido, usuario=usuario)
     pedido.estado = estado
     pedido.save(update_fields=["estado"])
     EventoPedido.objects.create(
@@ -108,4 +134,6 @@ def _cambiar_estado(*, pedido, estado, usuario, nota):
         usuario=usuario if getattr(usuario, "is_authenticated", False) else None,
         nota=nota[:500],
     )
+    if estado in (Pedido.Estado.RECIBIDO, Pedido.Estado.ENTREGADO):
+        registrar_venta(pedido=pedido, usuario=usuario)
     return pedido

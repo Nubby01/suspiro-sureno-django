@@ -146,12 +146,22 @@ def solicitar(*, cliente, nombre, correo, telefono, observaciones, lineas):
     nombre = (nombre or "").strip()
     if not nombre:
         raise ValidationError("Completa el nombre.")
+    observaciones = (observaciones or "").strip()[:1000]
+    # Esta es la entrada pública, incluso con sesión de personal. Los comandos
+    # internos conservan sus marcadores históricos al crear los modelos directamente.
+    # Reservar ambos prefijos usados por los filtros, también sin distinguir caja.
+    for texto in (nombre, observaciones):
+        if texto.casefold().startswith(("demo ·", "ejemplo de prueba")):
+            raise ValidationError(
+                "El inicio del nombre o de las observaciones está reservado para "
+                "registros internos. Escribe los detalles de tu solicitud sin ese prefijo."
+            )
     cotizacion = Cotizacion(
         cliente=cliente if getattr(cliente, "is_authenticated", False) else None,
         nombre=nombre[:120],
         correo=normalizar_correo(correo),
         telefono=normalizar_telefono(telefono),
-        observaciones=(observaciones or "").strip()[:1000],
+        observaciones=observaciones,
     )
     for _ in range(3):
         try:

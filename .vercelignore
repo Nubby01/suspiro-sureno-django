@@ -21,6 +21,8 @@ exports/
 fixtures_privadas/
 # Entornos, herramientas y artefactos regenerables
 .venv/
+.venv-local/
+.venv-*/
 venv/
 env/
 __pycache__/
@@ -45,3 +47,20 @@ Thumbs.db
 node_modules/
 
 .git/
+validacion_*.txt
+auditoria_*.json
+preview-dashboard/
+iniciar-local.ps1
+aplicar_*_local.py
+auditar_ventas_stock.py
+copiar_base_local.py
+integrar_historial.py
+verificar_base_local.py
+vista_previa_dashboard.py
+credentials*.json
+service-account*.json
+*.p12
+*.pfx
+*.sqlite-journal
+*.sqlite-wal
+*.sqlite-shm

@@ -4,6 +4,7 @@ from django.utils import timezone
 from apps.catalogo.models import Producto, VarianteProducto
 
 from .models import Insumo
+from apps.pedidos.models import Pedido
 from .servicios import cantidad_exacta
 
 
@@ -19,7 +20,7 @@ class InsumoForm(_Base):
     unidad = forms.ChoiceField(label="Unidad", choices=Insumo.Unidad.choices)
     stock_minimo = forms.CharField(
         label="Stock mínimo",
-        help_text="Se avisa cuando la existencia es igual o menor que este valor.",
+        help_text="En la unidad del insumo. Define el nivel bajo; la campana solo notifica críticos y agotados.",
     )
     stock_critico = forms.CharField(label="Stock crítico", required=False, help_text="Umbral absoluto en la unidad del insumo. Vacío: sin nivel crítico. No puede superar el mínimo. Cero se distingue como agotado.")
     activo = forms.BooleanField(label="Activo", required=False, initial=True)
@@ -64,6 +65,8 @@ class EntradaForm(MovimientoForm):
     fecha_compra = forms.DateField(label="Fecha de compra", required=False, widget=forms.DateInput(attrs={"type":"date"}, format="%Y-%m-%d"), input_formats=["%Y-%m-%d"])
     precio_compra = forms.DecimalField(label="Importe total de compra (CLP)", min_value=0, max_digits=12, decimal_places=2, required=False)
     proveedor = forms.CharField(label="Proveedor u origen", max_length=160, required=False)
+    tipo_referencia = forms.ChoiceField(label="Tipo de referencia", required=False, choices=(("", "Selecciona si es una compra"), ("documento", "Documento de compra"), ("interna", "Referencia interna (sin documento formal)")))
+    referencia_compra = forms.CharField(label="Referencia de compra", max_length=160, required=False, help_text="Usa el documento real o una referencia interna propia, sin inventar facturas. Se admite una entrada por insumo, proveedor y referencia. Otros insumos del mismo documento usan la misma referencia; consolida las líneas repetidas de un insumo en una sola entrada.")
     caducidad = forms.DateField(label="Fecha de caducidad", required=False, widget=forms.DateInput(attrs={"type":"date"}, format="%Y-%m-%d"), input_formats=["%Y-%m-%d"])
     lote = forms.CharField(label="Referencia de lote", max_length=100, required=False)
     observaciones = forms.CharField(label="Observaciones del abastecimiento", max_length=1000, required=False, widget=forms.Textarea(attrs={"rows":3}))
@@ -71,7 +74,7 @@ class EntradaForm(MovimientoForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["fecha_compra"].widget.attrs["max"] = timezone.localdate().isoformat()
-        self.fields["fecha_compra"].help_text = "Opcional. No puede ser posterior a hoy."
+        self.fields["fecha_compra"].help_text = "Obligatoria si es una compra. No puede ser posterior a hoy."
         self.fields["caducidad"].help_text = "Opcional. No puede ser anterior a la compra; admite registros históricos."
         for nombre in ("fecha_compra", "caducidad"):
             self.fields[nombre].error_messages["invalid"] = "Introduce una fecha válida."
@@ -79,6 +82,14 @@ class EntradaForm(MovimientoForm):
     def clean(self):
         datos = super().clean()
         compra, caducidad = datos.get("fecha_compra"), datos.get("caducidad")
+        if datos.get("es_compra"):
+            for campo in ("fecha_compra", "proveedor", "tipo_referencia", "referencia_compra"):
+                if not datos.get(campo) and campo not in self.errors:
+                    self.add_error(campo, "Obligatorio al registrar una compra.")
+            if datos.get("precio_compra") is None and "precio_compra" not in self.errors:
+                self.add_error("precio_compra", "Indica el importe total de compra.")
+        elif datos.get("tipo_referencia") or datos.get("referencia_compra"):
+            self.add_error("es_compra", "Marca compra o deja vacía su referencia.")
         if compra and compra > timezone.localdate():
             self.add_error("fecha_compra", "La fecha de compra no puede ser posterior a hoy.")
         if compra and caducidad and caducidad < compra:
@@ -89,6 +100,20 @@ class EntradaForm(MovimientoForm):
 
     def clean_cantidad(self):
         return cantidad_exacta(self.cleaned_data.get("cantidad"), minimo=0)
+
+
+class ConsumosFiltroForm(_Base):
+    fecha_inicial = forms.DateField(label="Fecha inicial", required=False, widget=forms.DateInput(attrs={"type":"date"}))
+    fecha_final = forms.DateField(label="Fecha final", required=False, widget=forms.DateInput(attrs={"type":"date"}))
+    insumo = forms.ModelChoiceField(label="Insumo", queryset=Insumo.objects.order_by("nombre"), required=False)
+    pedido = forms.ModelChoiceField(label="Pedido", queryset=Pedido.objects.order_by("-creada"), required=False)
+    incluir_demo = forms.BooleanField(label="Incluir registros de demostración", required=False)
+
+    def clean(self):
+        datos = super().clean()
+        if datos.get("fecha_inicial") and datos.get("fecha_final") and datos["fecha_inicial"] > datos["fecha_final"]:
+            self.add_error("fecha_final", "La fecha final no puede ser anterior a la inicial.")
+        return datos
 
 
 class AjusteForm(MovimientoForm):

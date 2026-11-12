@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import EventoPedido, LineaPedido, Pedido
+from .models import EventoPedido, LineaPedido, Pedido, VentaPedido
 
 
 class _SoloLectura(admin.ModelAdmin):
@@ -48,3 +48,8 @@ class PedidoAdmin(_SoloLectura):
     list_filter = ("estado",)
     search_fields = ("codigo", "nombre")
     inlines = (LineaPedidoInline, EventoPedidoInline)
+
+
+@admin.register(VentaPedido)
+class VentaPedidoAdmin(_SoloLectura):
+    list_display = ("pedido", "total", "fecha", "estado_origen", "fecha_estimada")

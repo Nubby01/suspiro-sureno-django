@@ -23,6 +23,7 @@
 <td data-etiqueta="Lote / saldo">{% if entrada.abastecimiento %}{{ entrada.abastecimiento.lote|default:"Sin referencia" }} · Saldo: {{ entrada.abastecimiento.saldo }}{% else %}Entrada anterior sin seguimiento de lote{% endif %}</td>
 <td data-etiqueta="Datos disponibles">{% if entrada.abastecimiento %}
   Proveedor/origen: {{ entrada.abastecimiento.proveedor|default:"No registrado" }}<br>
+  Referencia: {% if entrada.abastecimiento.referencia_compra %}{{ entrada.abastecimiento.get_tipo_referencia_display }} · {{ entrada.abastecimiento.referencia_compra }}{% else %}No registrada (histórico){% endif %}<br>
   Importe de compra: {% if entrada.abastecimiento.precio_compra != None %}{{ entrada.abastecimiento.precio_compra|monto_compra }}{% else %}No registrado{% endif %}<br>
   Caducidad: {{ entrada.abastecimiento.caducidad|date:"d-m-Y"|default:"No registrada" }}<br>
   {{ entrada.abastecimiento.observaciones }}

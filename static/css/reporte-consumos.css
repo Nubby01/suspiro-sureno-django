@@ -1,0 +1,39 @@
+.formulario-amplio > .consumos-acciones {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .75rem;
+  margin-top: .5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--beige-rose);
+}
+.consumos-acciones__demostracion {
+  display: inline-flex;
+  align-items: center;
+  gap: .6rem;
+  min-height: 2.875rem;
+  padding: .5rem .75rem;
+  margin: 0;
+  color: var(--chocolate);
+  font-size: .9rem;
+  font-weight: 400;
+  line-height: 1.4;
+  cursor: pointer;
+}
+.consumos-acciones__demostracion input[type="checkbox"] {
+  flex: 0 0 1.1rem;
+  width: 1.1rem;
+  height: 1.1rem;
+  min-height: 0;
+  margin: 0;
+  accent-color: var(--terracota);
+}
+.consumos-acciones__demostracion input:focus-visible {
+  outline: 2px solid var(--terracota);
+  outline-offset: 3px;
+}
+@media (max-width: 540px) {
+  .consumos-acciones > .ui-boton { flex: 1 1 10rem; }
+  .consumos-acciones__demostracion { flex-basis: 100%; padding-inline: 0; }
+}

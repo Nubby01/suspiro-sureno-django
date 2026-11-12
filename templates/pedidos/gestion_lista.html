@@ -1,7 +1,9 @@
 {% extends "panel/indice.html" %}
 
 {% block panel_cuerpo %}
+  {% if request.GET.ventas == "1" %}<p class="ayuda">Ventas realizadas{% if request.GET.periodo == "30" %} en los últimos 30 días{% endif %}. Cada pedido se cuenta una sola vez desde Recibido o Entregado. <a href="{% url 'pedidos_gestion' %}">Ver todos los pedidos</a></p>{% endif %}
   <form class="interno-filtros" method="get">
+    {% if request.GET.ventas == "1" %}<input type="hidden" name="ventas" value="1">{% if request.GET.periodo == "30" %}<input type="hidden" name="periodo" value="30">{% endif %}{% endif %}
     <div class="interno-filtros__campo">
       <label for="id_estado">Estado</label>
       <select id="id_estado" name="estado">
@@ -23,6 +25,7 @@
             <th>Fecha</th>
             <th>Estado</th>
             <th>Total</th>
+            <th>Venta</th>
             <th>Acción</th>
           </tr>
         </thead>
@@ -34,6 +37,7 @@
               <td data-etiqueta="Fecha">{{ pedido.creada|date:"d-m-Y" }}</td>
               <td data-etiqueta="Estado"><span class="estado estado--{{ pedido.estado }}">{{ pedido.get_estado_display }}</span></td>
               <td data-etiqueta="Total">{{ pedido.total_texto }}</td>
+              <td data-etiqueta="Venta">{% if pedido.venta %}<span class="estado estado--entregado">{% if pedido.es_demostracion %}Venta de demostración{% else %}Venta realizada{% endif %}</span>{% else %}Sin registro{% endif %}</td>
               <td data-etiqueta="Acción"><a class="interno-accion interno-accion--enlace ui-boton ui-boton--navegacion" href="{% url 'pedido_gestion' pedido.codigo %}">Ver detalle</a></td>
             </tr>
           {% endfor %}

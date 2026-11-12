@@ -48,7 +48,7 @@ def seccion_activa(nombre):
     grupos = {
         "cotizaciones_gestion": ("cotizaciones_gestion", "cotizacion_gestion", "cotizacion_pdf_gestion"),
         "pedidos_gestion": ("pedidos_gestion", "pedido_gestion"),
-        "inventario_gestion": ("inventario_gestion", "inventario_ficha", "inventario_nuevo", "inventario_editar", "inventario_entrada", "inventario_ajuste", "inventario_movimientos", "inventario_recetas", "inventario_receta_nueva"),
+        "inventario_gestion": ("inventario_gestion", "inventario_ficha", "inventario_nuevo", "inventario_editar", "inventario_entrada", "inventario_ajuste", "inventario_movimientos", "inventario_consumos", "inventario_recetas", "inventario_receta_nueva", "inventario_receta_editar"),
         "produccion_gestion": ("produccion_gestion", "produccion_gestion_detalle"),
         "produccion_trabajo": ("produccion_trabajo", "produccion_trabajo_detalle"),
         "clientes_gestion": ("clientes_gestion", "cliente_detalle"),

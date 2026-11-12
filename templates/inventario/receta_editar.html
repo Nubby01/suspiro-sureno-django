@@ -1,0 +1,19 @@
+{% extends "panel/indice.html" %}
+{% load interfaz %}
+{% block panel_cuerpo %}
+  <p class="interno__acciones"><a class="ui-boton ui-boton--navegacion" href="{% url 'catalogo_editar' receta.producto_id %}">Volver al producto</a><a class="ui-boton ui-boton--navegacion" href="{% url 'inventario_recetas' %}">Todas las recetas</a></p>
+  <section aria-labelledby="titulo-composicion-receta">
+    <h2 id="titulo-composicion-receta">Receta e insumos</h2>
+    <p>{{ receta.producto.nombre }} · {% if receta.variante %}{{ receta.variante.nombre|default:"Presentación principal" }}{% else %}Receta general del producto{% endif %}</p>
+    <p>Rendimiento actual: {{ receta.rendimiento }} unidades de la presentación vendida.</p>
+    <ul class="cuenta-lista">{% for ingrediente in ingredientes %}<li><span>{{ ingrediente.insumo.nombre }}</span><strong>{{ ingrediente.cantidad }} {{ ingrediente.insumo.unidad }}</strong><a class="ui-boton ui-boton--navegacion" href="{% url 'inventario_receta_editar' receta.pk %}?ingrediente={{ ingrediente.pk }}">Editar ingrediente {{ ingrediente.insumo.nombre }}</a></li>{% empty %}<li>Sin ingredientes: receta pendiente.</li>{% endfor %}</ul>
+  </section>
+  <h2>{% if ingrediente_actual %}Editar ingrediente{% else %}Agregar o actualizar un ingrediente{% endif %}</h2>
+  <p class="ayuda">El rendimiento corresponde a toda la receta. Si lo cambias, cambia la proporción de todos sus ingredientes para futuras preparaciones. Las existencias y los consumos ya registrados no se modifican. Elegir un ingrediente existente actualiza su cantidad sin duplicarlo.</p>
+  <form class="panel-form formulario-amplio" method="post" novalidate>
+    {% csrf_token %}
+    {% if formulario.non_field_errors %}<div class="mensaje-error" role="alert">{{ formulario.non_field_errors }}</div>{% endif %}
+    {% for campo in formulario %}<div class="campo"><label for="{{ campo.id_for_label }}">{{ campo.label }}</label>{{ campo|campo_ui }}{% if campo.help_text %}<p class="ayuda">{{ campo.help_text }}</p>{% endif %}{{ campo.errors }}</div>{% endfor %}
+    <button class="panel-enviar ui-boton ui-boton--guardar" type="submit">Guardar receta</button>
+  </form>
+{% endblock %}

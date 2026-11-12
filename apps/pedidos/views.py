@@ -4,6 +4,8 @@ from django.core.exceptions import ValidationError
 from django.http import Http404
 from django.shortcuts import redirect, render
 from django.views import View
+from datetime import timedelta
+from django.utils import timezone
 
 from apps.cuentas.models import Usuario
 from apps.cuentas.permisos import RequiereRolMixin
@@ -33,6 +35,12 @@ class ListaPedidosView(RequiereRolMixin, View):
         estado = (request.GET.get("estado") or "").strip()
         from apps.panel.demostracion import filtro_demo
         consulta = filtro_demo(Pedido.objects.select_related("cotizacion").prefetch_related("lineas"), request, "cotizacion__observaciones")
+        consulta = consulta.select_related("venta")
+        if request.GET.get("ventas") == "1":
+            consulta = consulta.filter(venta__isnull=False)
+            if request.GET.get("periodo") == "30":
+                ahora = timezone.now()
+                consulta = consulta.filter(venta__fecha__gte=ahora - timedelta(days=30), venta__fecha__lte=ahora)
         if estado in Pedido.Estado.values:
             consulta = consulta.filter(estado=estado)
         return render(
@@ -54,7 +62,7 @@ class DetallePedidoView(RequiereRolMixin, View):
     def get_pedido(self, codigo):
         pedido = (
             Pedido.objects.filter(codigo=codigo)
-            .select_related("cotizacion")
+            .select_related("cotizacion", "venta")
             .prefetch_related("lineas", "eventos", "eventos__usuario")
             .first()
         )

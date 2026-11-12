@@ -1,0 +1,31 @@
+<section class="recetas-producto" aria-labelledby="titulo-recetas-producto">
+  <h2 id="titulo-recetas-producto">Receta e insumos</h2>
+  <p class="ayuda">Información interna de producción. La receta específica de una variante tiene prioridad sobre la general del producto. El stock se valida al iniciar la preparación.</p>
+  <h3>Estado por variante</h3>
+  <ul class="cuenta-lista">
+    {% for fila in variantes_receta %}
+      <li>
+        <strong>{{ fila.variante.nombre|default:"Presentación principal" }}{% if not fila.variante.activa %} · Inactiva{% endif %}</strong>
+        <span class="estado {% if fila.configurada %}estado--listo{% else %}estado--recibido{% endif %}">{% if fila.configurada %}Receta configurada{% else %}Receta pendiente{% endif %}</span>
+        {% if fila.motivo %}<span>{{ fila.motivo }}</span>{% endif %}
+        {% if fila.receta and not receta_compuesta_pendiente %}
+          <span>{% if fila.especifica %}Receta específica de esta variante.{% else %}Se utiliza la receta general del producto.{% endif %}</span>
+          <a class="ui-boton ui-boton--navegacion" href="{% url 'inventario_receta_editar' fila.receta.pk %}">Consultar y editar receta</a>
+        {% elif not receta_compuesta_pendiente %}
+          <a class="ui-boton ui-boton--navegacion" href="{% url 'inventario_receta_nueva' %}?producto={{ producto.pk }}&amp;variante={{ fila.variante.pk }}">Configurar receta de esta variante</a>
+        {% endif %}
+      </li>
+    {% empty %}<li>El producto aún no tiene variantes.</li>{% endfor %}
+  </ul>
+  <h3>Recetas vinculadas</h3>
+  {% for fila in recetas_producto %}
+    <section class="panel-bloque" aria-label="Receta {{ forloop.counter }}">
+      <h4>{% if fila.receta.variante %}{{ fila.receta.variante.nombre|default:"Presentación principal" }}{% else %}Receta general del producto{% endif %}</h4>
+      {% if fila.demostracion %}<p class="ayuda">Receta de demostración. No se aplica a pedidos comerciales y no se edita desde este producto.</p>{% endif %}
+      <p>Rendimiento: {{ fila.receta.rendimiento }} unidades de {% if fila.receta.variante %}{{ fila.receta.variante.nombre|default:"la presentación principal" }}{% else %}la presentación vendida del producto{% endif %}.</p>
+      <ul class="cuenta-lista">{% for ingrediente in fila.ingredientes %}<li><span>{{ ingrediente.insumo.nombre }}</span><strong>{{ ingrediente.cantidad }} {{ ingrediente.insumo.unidad }}</strong>{% if not ingrediente.insumo.activo %}<span>Insumo inactivo</span>{% endif %}</li>{% empty %}<li>Sin ingredientes: receta pendiente.</li>{% endfor %}</ul>
+      {% if not fila.demostracion and not receta_compuesta_pendiente %}<p><a class="ui-boton ui-boton--navegacion" href="{% url 'inventario_receta_editar' fila.receta.pk %}">Editar receta</a></p>{% endif %}
+    </section>
+  {% empty %}<p>No hay recetas vinculadas. Receta pendiente.</p>{% endfor %}
+  {% if not receta_compuesta_pendiente %}<p><a class="ui-boton ui-boton--navegacion" href="{% url 'inventario_receta_nueva' %}?producto={{ producto.pk }}">Configurar receta general del producto</a></p>{% endif %}
+</section>

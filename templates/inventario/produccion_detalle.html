@@ -30,7 +30,9 @@
       <button class="panel-enviar ui-boton ui-boton--guardar" type="submit">Guardar asignación</button>
     </form>
   {% endif %}
-  <h2>Productos</h2>
+  {% if es_administradora and not consumo %}<p class="ayuda">Al iniciar la preparación se descuentan los insumos de las recetas según las unidades del pedido. Si falta receta o existencia, el pedido no avanza y no se aplica ningún descuento. <a href="{% url 'inventario_recetas' %}">Revisar recetas</a></p>{% endif %}
+  <h2>Productos y cantidades solicitadas</h2>
+  {% if pedido.estado == "listo" or pedido.estado == "entregado" %}<p class="ayuda">Preparación finalizada. Estos son los productos preparados; los insumos no se descuentan otra vez.</p>{% endif %}
   <div class="tabla-marco">
     <table class="tabla-panel">
       <thead>
@@ -51,6 +53,17 @@
       </tbody>
     </table>
   </div>
+  <section aria-labelledby="titulo-insumos-descontados">
+    <h2 id="titulo-insumos-descontados">Insumos descontados</h2>
+    {% if consumo %}<p>Fecha del consumo: {{ consumo.creada|date:"d-m-Y H:i" }}. Este registro se conserva al marcar Listo o Entregado.</p>{% endif %}
+    {% if insumos_descontados %}
+      <p class="ayuda">Cantidades efectivamente descontadas según los movimientos de inventario; no se recalculan desde la receta actual.</p>
+      <div class="tabla-marco"><table class="tabla-panel"><thead><tr><th>Insumo</th><th>Cantidad descontada</th><th>Unidad</th><th>Fecha del movimiento</th></tr></thead><tbody>
+        {% for item in insumos_descontados %}<tr><td data-etiqueta="Insumo">{{ item.movimiento.insumo.nombre }}</td><td data-etiqueta="Cantidad descontada">{{ item.cantidad }}</td><td data-etiqueta="Unidad">{{ item.movimiento.insumo.unidad }}</td><td data-etiqueta="Fecha del movimiento">{{ item.movimiento.creada|date:"d-m-Y H:i" }}</td></tr>{% endfor %}
+      </tbody></table></div>
+    {% elif consumo %}<p class="mensaje-error">El pedido tiene una marca de consumo, pero no se encontraron sus movimientos. Administración debe revisar el historial de inventario.</p>
+    {% else %}<p>Aún no se han descontado ingredientes. El descuento se realiza una sola vez al iniciar En preparación, si hay recetas y existencias suficientes.</p>{% endif %}
+  </section>
   <h2>Historial</h2>
   <ol class="linea-tiempo">
     {% for evento in pedido.eventos.all %}

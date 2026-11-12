@@ -10,6 +10,10 @@ caso, el movimiento se rechaza sin aplicarse.
 """
 
 import re
+import hashlib
+import json
+import unicodedata
+from django.utils import timezone
 from decimal import Decimal, InvalidOperation
 
 from django.core.exceptions import ValidationError
@@ -17,6 +21,8 @@ from django.db import IntegrityError, OperationalError, transaction
 from django.db.models import F
 
 from apps.catalogo.rollitos import SLUG as SLUG_ROLLITOS
+from apps.catalogo.brownie import SLUG as SLUG_BROWNIE
+from apps.catalogo.berlines import SLUG as SLUG_BERLINES
 
 from .models import Abastecimiento, SalidaLote, PRECISA, ConsumoPedido, Insumo, MovimientoInventario, Receta, RecetaIngrediente
 
@@ -33,6 +39,11 @@ MENSAJE_ROLLITOS = (
     "Rollitos de sabores no tiene un consumo determinado. "
     "El pedido sigue pendiente de resolución y no se descontaron ingredientes."
 )
+MENSAJE_COMPOSICION_PENDIENTE = (
+    "{nombre} tiene rellenos seleccionables cuya composición necesita definirse "
+    "antes de descontar ingredientes. No se inició la preparación ni se descontaron "
+    "insumos del pedido."
+)
 MENSAJE_STOCK = "No hay existencia suficiente de {nombre}. No se modificó el inventario."
 MENSAJE_YA_CONSUMIO = "Este pedido ya descontó inventario."
 MENSAJE_PRECISION = "El consumo de {nombre} no coincide con la precisión de 3 decimales."
@@ -40,6 +51,30 @@ MENSAJE_CAJA = (
     "Rollitos de sabores no tiene una receta única. "
     "Configura cada sabor por separado."
 )
+
+
+def _referencia_compra(datos, insumo_id):
+    datos = dict(datos or {})
+    if not datos.get("es_compra"):
+        if datos.get("referencia_compra") or datos.get("tipo_referencia"):
+            raise ValidationError("Una referencia de compra requiere marcar Es una compra.")
+        return datos
+    if not datos.get("fecha_compra") or datos.get("precio_compra") is None or not str(datos.get("proveedor") or "").strip():
+        raise ValidationError("La compra requiere fecha, importe y proveedor.")
+    if datos["fecha_compra"] > timezone.localdate():
+        raise ValidationError("La fecha de compra no puede ser posterior a hoy.")
+    if datos.get("tipo_referencia") not in ("documento", "interna") or not str(datos.get("referencia_compra") or "").strip():
+        raise ValidationError("Indica una referencia real de documento o una referencia interna de la compra.")
+    if datos.get("caducidad") and datos["caducidad"] < datos["fecha_compra"]:
+        raise ValidationError("La caducidad no puede ser anterior a la compra.")
+    datos["proveedor"] = datos["proveedor"].strip()
+    datos["referencia_compra"] = datos["referencia_compra"].strip()
+    normalizar = lambda s: " ".join(unicodedata.normalize("NFKC", s).casefold().split())
+    identidad = [normalizar(datos["proveedor"]), datos["tipo_referencia"], normalizar(datos["referencia_compra"]), insumo_id]
+    datos["huella_compra"] = hashlib.sha256(json.dumps(identidad, ensure_ascii=False).encode()).hexdigest()
+    if Abastecimiento.objects.filter(huella_compra=datos["huella_compra"]).exists():
+        raise ValidationError("Ya se registró este insumo con la misma referencia y proveedor. No se ingresó stock otra vez.")
+    return datos
 
 
 def cantidad_exacta(valor, *, minimo=None, permitir_cero=False):
@@ -90,6 +125,19 @@ def _usuario(usuario):
     if getattr(usuario, "is_authenticated", False):
         return usuario
     return None
+
+
+def validar_insumo_comercial(insumo):
+    nombre = insumo.nombre.strip().casefold()
+    if nombre.startswith(("demo · ", "ejemplo de prueba")):
+        raise ValidationError("Una receta comercial no puede utilizar insumos DEMO. Usa una receta de ejemplo o un insumo comercial real.")
+
+
+def _receta_segura(receta):
+    if not receta.alcance.startswith("ejemplo:"):
+        for ingrediente in receta.ingredientes.all():
+            validar_insumo_comercial(ingrediente.insumo)
+    return receta
 
 
 @transaction.atomic
@@ -146,8 +194,8 @@ def registrar_movimiento(*, insumo, tipo, cantidad, motivo, usuario, clave, pedi
             movimiento.full_clean()
             movimiento.save()
             if tipo == MovimientoInventario.Tipo.ENTRADA:
-                datos = dict(abastecimiento or {})
-                permitidos = {"es_compra", "fecha_compra", "precio_compra", "proveedor", "caducidad", "lote", "observaciones"}
+                datos = _referencia_compra(abastecimiento, bloqueado.pk)
+                permitidos = {"es_compra", "fecha_compra", "precio_compra", "proveedor", "caducidad", "lote", "observaciones", "tipo_referencia", "referencia_compra", "huella_compra"}
                 registro = Abastecimiento(movimiento=movimiento, cantidad_inicial=delta, saldo=delta, unidad=bloqueado.unidad, **{k:v for k,v in datos.items() if k in permitidos})
                 registro.full_clean()
                 registro.save()
@@ -175,6 +223,7 @@ def registrar_movimiento(*, insumo, tipo, cantidad, motivo, usuario, clave, pedi
 
 
 def agregar_ingrediente(*, producto, variante, insumo, cantidad, rendimiento, unidad):
+    validar_insumo_comercial(insumo)
     if variante is not None and variante.producto_id != producto.pk:
         raise ValidationError("La variante no pertenece a ese producto.")
     if producto.slug == SLUG_ROLLITOS:
@@ -257,6 +306,10 @@ def _receta_de_linea(linea):
     producto = linea.variante.producto
     if producto.slug == SLUG_ROLLITOS:
         raise ValidationError(MENSAJE_ROLLITOS)
+    # Bloqueo temporal por identidad del producto, igual que Rollitos: no depende
+    # del ID de la base, de que exista receta o de si es comercial o DEMO.
+    if producto.slug in (SLUG_BROWNIE, SLUG_BERLINES):
+        raise ValidationError(MENSAJE_COMPOSICION_PENDIENTE.format(nombre=producto.nombre))
     consulta = _recetas_de_linea(linea)
     especifica = (
         consulta.filter(variante=linea.variante)
@@ -264,7 +317,7 @@ def _receta_de_linea(linea):
         .first()
     )
     if especifica is not None:
-        return especifica
+        return _receta_segura(especifica)
     general = (
         consulta.filter(producto=producto, variante__isnull=True)
         .prefetch_related("ingredientes__insumo")
@@ -272,7 +325,7 @@ def _receta_de_linea(linea):
     )
     if general is None:
         raise ValidationError(MENSAJE_SIN_RECETA.format(nombre=linea.nombre_producto))
-    return general
+    return _receta_segura(general)
 
 
 @transaction.atomic

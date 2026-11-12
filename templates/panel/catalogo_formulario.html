@@ -45,4 +45,7 @@
     {% endfor %}
     <button class="panel-enviar ui-boton" type="submit">{{ enviar }}</button>
   </form>
+  {% if producto %}
+    {% include "panel/_recetas_producto.html" %}
+  {% endif %}
 {% endblock %}

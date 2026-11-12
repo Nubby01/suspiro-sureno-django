@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.db import models
+from django.utils import timezone
 
 from apps.catalogo.consultas import formato_clp
 from apps.cotizaciones.models import codigo_publico
@@ -68,6 +69,27 @@ class Pedido(models.Model):
 
                 raise ValidationError("No se pudo crear el identificador del pedido.")
         super().save(*args, **kwargs)
+
+    def total_texto(self):
+        return formato_clp(self.total)
+
+    @property
+    def es_demostracion(self):
+        return (self.cotizacion.observaciones or "").casefold().startswith(("demo · ", "ejemplo de prueba"))
+
+
+class VentaPedido(models.Model):
+    """Un único ingreso reconocido por pedido; avanzar de estado no lo duplica."""
+    pedido = models.OneToOneField(Pedido, on_delete=models.PROTECT, related_name="venta")
+    total = models.DecimalField("importe recibido", max_digits=12, decimal_places=0)
+    fecha = models.DateTimeField("fecha de la venta", default=timezone.now)
+    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, null=True, blank=True)
+    estado_origen = models.CharField(max_length=20, choices=Pedido.Estado.choices)
+    fecha_estimada = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ["-fecha", "-pk"]
+        constraints = [models.CheckConstraint(condition=models.Q(total__gte=0), name="venta_total_no_negativo")]
 
     def total_texto(self):
         return formato_clp(self.total)

@@ -11,10 +11,11 @@ class FechasEntradaTests(TestCase):
         self.hoy = timezone.localdate()
 
     def formulario(self, **fechas):
-        return EntradaForm({"insumo":self.insumo.pk,"cantidad":"10","motivo":"Ingreso histórico", "clave":"fecha-qa", "es_compra":"on", **fechas})
+        return EntradaForm({"insumo":self.insumo.pk,"cantidad":"10","motivo":"Ingreso histórico", "clave":"fecha-qa", "es_compra":"on", "proveedor":"Proveedor QA", "precio_compra":"100", "tipo_referencia":"interna", "referencia_compra":"COMPRA-FECHAS", **fechas})
 
-    def test_fechas_opcionales(self):
-        self.assertTrue(self.formulario().is_valid())
+    def test_fecha_obligatoria_para_compra(self):
+        self.assertFalse(self.formulario().is_valid())
+        self.assertIn("fecha_compra",self.formulario().errors)
 
     def test_compra_futura_rechazada(self):
         form = self.formulario(fecha_compra=(self.hoy+timedelta(days=1)).isoformat())

@@ -1,0 +1,24 @@
+{% extends "panel/indice.html" %}
+{% load interfaz %}
+{% load static %}
+{% block estilos_extra %}{{ block.super }}<link rel="stylesheet" href="{% static 'css/reporte-consumos.css' %}?v=1">{% endblock %}
+{% block panel_cuerpo %}
+<p><a class="ui-boton ui-boton--navegacion" href="{% url 'inventario_gestion' %}">Volver al inventario</a></p>
+<form class="panel-form formulario-amplio" method="get" novalidate>
+  {% for campo in formulario %}{% if campo.name != "incluir_demo" %}<div class="campo"><label for="{{ campo.id_for_label }}">{{ campo.label }}</label>{{ campo|campo_ui }}{{ campo.errors }}</div>{% endif %}{% endfor %}
+  <div class="consumos-acciones">
+    <button class="ui-boton" type="submit">Consultar consumos</button>
+    <a class="ui-boton ui-boton--navegacion" href="{% url 'inventario_consumos' %}">Limpiar filtros</a>
+    <label class="consumos-acciones__demostracion" for="{{ formulario.incluir_demo.id_for_label }}">{{ formulario.incluir_demo }}<span>{{ formulario.incluir_demo.label }}</span></label>
+    {{ formulario.incluir_demo.errors }}
+  </div>
+</form>
+<p class="ayuda">Las fechas incluyen el día inicial y final completos, en la zona horaria del proyecto. Solo se muestran consumos de producción; no entradas ni ajustes. Las cantidades de unidades diferentes no se suman entre sí.</p>
+<h2>Resumen de cantidades consumidas</h2>
+<ul class="cuenta-lista">{% for fila in resumen_consumos %}<li><strong>{{ fila.insumo__nombre }}</strong><span>{{ fila.consumido }} {{ fila.insumo__unidad }}</span></li>{% empty %}<li>No hay consumos para los filtros válidos seleccionados.</li>{% endfor %}</ul>
+<h2>Detalle de consumos</h2>
+<div class="tabla-marco"><table class="tabla-panel"><thead><tr><th>Fecha</th><th>Insumo</th><th>Cantidad utilizada</th><th>Unidad</th><th>Pedido</th><th>Responsable</th></tr></thead><tbody>
+{% for movimiento in pagina %}<tr><td data-etiqueta="Fecha">{{ movimiento.creada|date:"d-m-Y H:i" }}</td><td data-etiqueta="Insumo">{{ movimiento.insumo.nombre }}</td><td data-etiqueta="Cantidad utilizada">{{ movimiento.cantidad_utilizada }}</td><td data-etiqueta="Unidad">{{ movimiento.insumo.unidad }}</td><td data-etiqueta="Pedido">{% if movimiento.pedido %}<a href="{% url 'pedido_gestion' movimiento.pedido.codigo %}">{{ movimiento.pedido.codigo }}</a>{% else %}Sin pedido asociado{% endif %}</td><td data-etiqueta="Responsable">{{ movimiento.usuario.get_username|default:"No registrado" }}</td></tr>{% empty %}<tr><td colspan="6">No hay consumos que mostrar.</td></tr>{% endfor %}
+</tbody></table></div>
+{% if pagina.has_other_pages %}<nav aria-label="Páginas de consumos">{% if pagina.has_previous %}<a href="?{{ filtros_url }}&amp;pagina={{ pagina.previous_page_number }}">Anterior</a>{% endif %} <span>Página {{ pagina.number }} de {{ pagina.paginator.num_pages }}</span> {% if pagina.has_next %}<a href="?{{ filtros_url }}&amp;pagina={{ pagina.next_page_number }}">Siguiente</a>{% endif %}</nav>{% endif %}
+{% endblock %}

@@ -13,6 +13,7 @@ from .forms import AyudanteForm
 from .listado import listado_interno
 from .navegacion import contexto_panel
 from .resumen import resumen_gestion
+from .dashboard import dashboard_gestion, dashboard_trabajo
 
 
 class _PanelView(RequiereRolMixin, TemplateView):
@@ -26,20 +27,26 @@ class _PanelView(RequiereRolMixin, TemplateView):
 
 
 class GestionView(_PanelView):
-    template_name = "panel/indice.html"
+    template_name = "panel/dashboard_gestion.html"
     panel = "gestion"
     roles = (Usuario.Rol.ADMINISTRADORA,)
 
     def get_context_data(self, **kwargs):
         contexto = super().get_context_data(**kwargs)
         contexto["resumen"] = resumen_gestion()
+        contexto["comercial"] = dashboard_gestion()
         return contexto
 
 
 class TrabajoView(_PanelView):
-    template_name = "panel/indice.html"
+    template_name = "panel/dashboard_trabajo.html"
     panel = "trabajo"
     roles = (Usuario.Rol.AYUDANTE, Usuario.Rol.ADMINISTRADORA)
+
+    def get_context_data(self, **kwargs):
+        contexto = super().get_context_data(**kwargs)
+        contexto["jornada"] = dashboard_trabajo(self.request.user)
+        return contexto
 
 
 class CatalogoInternoView(RequiereRolMixin, TemplateView):

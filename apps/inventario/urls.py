@@ -13,10 +13,14 @@ from .views import (
     ProduccionTrabajoDetalleView,
     ProduccionTrabajoView,
     RecetaNuevaView,
+    RecetaEditarView,
     RecetasView,
+    ReporteConsumosView,
 )
 
 urlpatterns = [
+    path("cuenta/gestion/inventario/consumos/", ReporteConsumosView.as_view(), name="inventario_consumos"),
+    path("cuenta/gestion/inventario/recetas/<int:receta_id>/", RecetaEditarView.as_view(), name="inventario_receta_editar"),
     path("cuenta/gestion/inventario/<int:insumo_id>/historial/", FichaInsumoView.as_view(), name="inventario_ficha"),
     path("cuenta/trabajo/asignado/", ProduccionTrabajoView.as_view(), name="trabajo_asignado"),
     path("cuenta/gestion/inventario/", ListaInsumosView.as_view(), name="inventario_gestion"),

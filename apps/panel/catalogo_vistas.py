@@ -26,6 +26,7 @@ from apps.catalogo.imagenes import fotografia_publica
 from apps.catalogo.models import Producto
 from apps.cuentas.models import Usuario
 from apps.cuentas.permisos import RequiereRolMixin
+from apps.inventario.consultas_recetas import recetas_del_producto
 
 from .navegacion import contexto_panel
 
@@ -137,6 +138,7 @@ class ProductoEditarView(RequiereRolMixin, FormView):
         contexto["producto"] = producto
         contexto["precio_texto"] = _precio_visible(producto)
         contexto["foto"] = fotografia_publica(producto.referencia_imagen, producto.nombre)
+        contexto.update(recetas_del_producto(producto))
         return contexto
 
     def form_valid(self, form):

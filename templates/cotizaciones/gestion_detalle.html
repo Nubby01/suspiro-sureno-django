@@ -62,6 +62,7 @@
   {% if confirmada %}
     <form class="panel-form formulario-amplio" method="post">
       {% csrf_token %}
+      <p class="ayuda">Convierte la cotización cuando hayas recibido el pago completo. El pedido quedará Recibido y se registrará una única venta por el total confirmado. Los insumos se descuentan después, al iniciar la preparación.</p>
       <button class="panel-enviar ui-boton" type="submit" name="accion" value="convertir">Convertir en pedido</button>
     </form>
   {% endif %}
